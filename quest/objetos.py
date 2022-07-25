@@ -49,15 +49,17 @@ class Asteroide(Sprite):
                 pg.image.load(os.path.join(
                     "resources", "images", "asteroide.png")).convert(), (25, 25))
             self.radius = 12
+        self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(ANCHO_P - self.rect.width)
-        self.rect.y -= self.rect.height
-        self.velocidad_y = random.randrange(1, 10)
+        self.rect.y = random.randrange(ALTO_P - self.rect.height)
+        self.rect.x -= self.rect.width
+        self.velocidad_x = random.randrange(4, 10)
 
     def update(self):
-        self.rect.y += self.velocidad_y
-        if self.rect.top > ALTO_P:
-            self.rect.x = random.randrange(ANCHO_P - self.rect.width)
-            self.rect.y -= self.rect.width
+        self.rect.x -= self.velocidad_x
+        if self.rect.left < 0:
+            self.rect.x = random.randrange(ANCHO_P)
+            self.rect.x -= self.rect.width
 
-            self.velocidad_y = random.randrange(1, 10)
+            self.velocidad_x = random.randrange(1, 10)
