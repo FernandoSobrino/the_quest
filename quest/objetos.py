@@ -1,9 +1,10 @@
 import os
 import random
+
 import pygame as pg
 from pygame.sprite import Sprite
 
-from . import ANCHO_P, ALTO_P, TIEMPO_LASER_JUGADOR
+from . import ANCHO_P, ALTO_P, FPS
 
 
 class Nave(Sprite):
@@ -31,8 +32,61 @@ class Nave(Sprite):
 
 
 class Asteroide(Sprite):
-    def __init__(self):
+    def __init__(self,x,y):
         super().__init__()
+        self.w = 128
+        self.h = 128
+        self.image = pg.Surface((self.w,self.h),pg.SRCALPHA,32)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+        #Almacenar los frames
+        self.frames = []
+        self.index = 0
+        self.how_many = 0
+        self.animation_time = FPS // 2
+
+        self.loadFrames()
+        self.current_time = 0
+
+    def loadFrames(self):
+        
+        sprite_sheet = pg.image.load(os.path.join(
+            "resources","images","asteroids.png"))
+        
+        
+        for fila in range(8):
+            y = fila * self.h
+            for columna in range(8):
+                x = columna * self.w
+
+                self.image.blit(sprite_sheet,(0,0),(x,y,self.w,self.h))
+                    
+
+                self.frames.append(self.image)
+        
+        self.how_many = len(self.frames)
+        self.image = self.frames[self.index]
+
+
+    def update(self,ticks_reloj):
+        self.current_time += ticks_reloj
+        if self.current_time > self.animation_time:
+            self.current_time = 0
+            self.index += 1
+
+            if self.index >= self.how_many:
+                self.index = 0
+
+            self.image = self.frames[self.index]
+        
+        
+        
+        
+        
+        #Comentado, primera solución que tuve para que se movieran por la pantalla
+        """
         self.img_aleatoria = random.randrange(3)
         if self.img_aleatoria == 0:
             self.image = pg.transform.scale(
@@ -63,3 +117,5 @@ class Asteroide(Sprite):
             self.rect.x -= self.rect.width
 
             self.velocidad_x = random.randrange(1, 10)
+
+        """
