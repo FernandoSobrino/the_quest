@@ -83,7 +83,7 @@ class PantallaJuego(Pantalla):
             self.pantalla.blit(self.player.image, self.player.rect)
 
             # Para actualizar y dibujar el meteorito
-            self.allsprites.update(self.reloj.tick(FPS))
+            self.allsprites.update()
             self.allsprites.draw(self.pantalla)
 
             pg.display.flip()
