@@ -40,13 +40,13 @@ class Asteroide(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.velocidad_x = 5
+        
 
         #Almacenar los frames
         self.frames = []
         self.index = 0
         self.how_many = 0
-        self.animation_time = FPS // 4
+        self.animation_time = FPS // 2
 
         self.loadFrames()
         self.current_time = 0
@@ -73,7 +73,7 @@ class Asteroide(Sprite):
 
     def update(self):
         self.current_time += self.animation_time
-        if self.current_time > self.animation_time:
+        if self.current_time > FPS:
             self.current_time = 0
             self.index += 1
 
@@ -82,12 +82,18 @@ class Asteroide(Sprite):
 
             self.image = self.frames[self.index]
 
-        self.rect.x -= self.velocidad_x
+        self.rect.x -= random.randrange(5,15)
         if self.rect.left < 0:
-            self.rect.x = random.randrange(ANCHO_P)
+            self.rect.x = (ANCHO_P)
             self.rect.x -= self.rect.width
 
-            self.velocidad_x = random.randrange(1, 10)
+            
+            
+            
+            
+            
+            
+            #self.velocidad_x = random.randrange(5, 15)
         
         
         
