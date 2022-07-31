@@ -1,5 +1,6 @@
 import os
 import pygame as pg
+import random
 
 from quest import ANCHO_P, ALTO_P, COLOR_AMARILLO, FPS
 
@@ -59,15 +60,20 @@ class PantallaPrincipal(Pantalla):
 
 
 class PantallaJuego(Pantalla):
+
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
         self.fondo = pg.image.load(os.path.join(
             "resources", "images", "espacio.jpeg"))
         self.player = Nave()
-        self.meteorito = Asteroide(ANCHO_P-125, ALTO_P/2)
-        self.allsprites = pg.sprite.Group()
-        self.allsprites.add(self.meteorito)
+        self.meteoritos = pg.sprite.Group()
 
+        generador_meteoritos = random.randrange(6)
+        for x in range(generador_meteoritos):
+            self.meteorito = Asteroide()
+            self.meteoritos.add(self.meteorito)
+        
+        
     def bucle_principal(self):
         self.reloj.tick(FPS)
         salir = False
@@ -78,21 +84,30 @@ class PantallaJuego(Pantalla):
 
             self.pintar_fondo()
 
+            
             # Para mover y pintar la nave
             self.player.update()
             self.pantalla.blit(self.player.image, self.player.rect)
-
+            self.meteoritos.draw(self.pantalla)
+            self.meteoritos.update()
             # Para actualizar y dibujar el meteorito
-            self.allsprites.update()
-            self.allsprites.draw(self.pantalla)
+            
+            
+            
+            
+
+            """
+            self.hit = pg.sprite.spritecollide(
+                self.player, self.meteoritos, False)
+            if self.hit:
+                self.player.image.set_alpha(0)
+            """
+            
 
             pg.display.flip()
 
+    
     def pintar_fondo(self):
         self.pantalla.blit(self.fondo, (0, 0))
 
-    def crear_meteoritos(self):
-        self.meteoritos = pg.sprite.Group()
-        for x in range(10):
-            self.meteorito = Asteroide()
-            self.meteoritos.add(self.meteorito)
+

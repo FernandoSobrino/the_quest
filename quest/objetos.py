@@ -32,46 +32,45 @@ class Nave(Sprite):
 
 
 class Asteroide(Sprite):
-    def __init__(self,x,y):
+    def __init__(self):
         super().__init__()
         self.w = 128
         self.h = 128
-        self.image = pg.Surface((self.w,self.h),pg.SRCALPHA,32)
+        self.image = pg.Surface((self.w, self.h), pg.SRCALPHA, 32)
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = ANCHO_P - self.rect.width
+        self.rect.y = random.randrange(ALTO_P-self.rect.height)
         
 
-        #Almacenar los frames
+        # Almacenar los frames
         self.frames = []
         self.index = 0
         self.how_many = 0
         self.animation_time = FPS // 2
-
-        self.loadFrames()
+        
         self.current_time = 0
 
+
     def loadFrames(self):
-        
+
         sprite_sheet = pg.image.load(os.path.join(
-            "resources","images","asteroids.png"))
-        
-        
-        for fila in range(8):
+            "resources", "images", "asteroids.png"))
+
+        for fila in range(4):
             y = fila * self.h
             for columna in range(8):
                 x = columna * self.w
-                image =pg.Surface((self.w,self.h),pg.SRCALPHA)
-                image.blit(sprite_sheet,(0,0),(x,y,self.w,self.h))
-                    
-
+                image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+                image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
                 self.frames.append(image)
         
+
         self.how_many = len(self.frames)
         self.image = self.frames[self.index]
 
 
-    def update(self):
+
+    def animarFrames(self):
         self.current_time += self.animation_time
         if self.current_time > FPS:
             self.current_time = 0
@@ -82,24 +81,25 @@ class Asteroide(Sprite):
 
             self.image = self.frames[self.index]
 
-        self.rect.x -= random.randrange(5,15)
-        if self.rect.left < 0:
-            self.rect.x = (ANCHO_P)
+
+    
+
+    def update(self):
+        self.loadFrames()
+        self.animarFrames()
+
+        self.velocidad_x = random.randrange(5, 10)
+        self.rect.x -= self.velocidad_x
+
+        if self.rect.right < 0:
+            self.rect.x = ANCHO_P
+            self.rect.y = random.randrange(ALTO_P - self.rect.height)
             self.rect.x -= self.rect.width
 
-            
-            
-            
-            
-            
-            
+
             #self.velocidad_x = random.randrange(5, 15)
-        
-        
-        
-        
-        
-        #Comentado, primera solución que tuve para hacer meteoritos de diferentes tamaños
+
+        # Comentado, primera solución que tuve para hacer meteoritos de diferentes tamaños: no funciona
         """
         self.img_aleatoria = random.randrange(3)
         if self.img_aleatoria == 0:
@@ -123,13 +123,4 @@ class Asteroide(Sprite):
         self.rect.y = random.randrange(ALTO_P - self.rect.height)
         self.rect.x -= self.rect.width
         self.velocidad_x = random.randrange(4, 10)
-
-    def update(self):
-        self.rect.x -= self.velocidad_x
-        if self.rect.left < 0:
-            self.rect.x = random.randrange(ANCHO_P)
-            self.rect.x -= self.rect.width
-
-            self.velocidad_x = random.randrange(1, 10)
-
         """
