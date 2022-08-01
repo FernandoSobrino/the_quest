@@ -1,7 +1,4 @@
-import os
-
 import pygame as pg
-from pygame.sprite import Sprite
 
 from . import ALTO_P, ANCHO_P
 from .pantallas import Pantalla, PantallaPrincipal, PantallaJuego

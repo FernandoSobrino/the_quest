@@ -35,13 +35,12 @@ class Asteroide(Sprite):
     def __init__(self):
         super().__init__()
         self.w = 128
-        self.h = 128
+        self.h = 128       
         self.image = pg.Surface((self.w, self.h), pg.SRCALPHA, 32)
         self.rect = self.image.get_rect()
         self.rect.x = ANCHO_P - self.rect.width
         self.rect.y = random.randrange(ALTO_P-self.rect.height)
         
-
         # Almacenar los frames
         self.frames = []
         self.index = 0
@@ -96,31 +95,15 @@ class Asteroide(Sprite):
             self.rect.y = random.randrange(ALTO_P - self.rect.height)
             self.rect.x -= self.rect.width
 
+        if self.rect.y > ALTO_P:
+            self.rect.y = ALTO_P - 30
+        if self.rect.y < 0:
+            self.rect.y = 0
 
             #self.velocidad_x = random.randrange(5, 15)
 
         # Comentado, primera solución que tuve para hacer meteoritos de diferentes tamaños: no funciona
         """
-        self.img_aleatoria = random.randrange(3)
-        if self.img_aleatoria == 0:
-            self.image = pg.transform.scale(
-                pg.image.load(os.path.join(
-                    "resources", "images", "asteroide.png")).convert(), (100, 100))
-            self.radius = 50
-        if self.img_aleatoria == 1:
-            self.image = pg.transform.scale(
-                pg.image.load(os.path.join(
-                    "resources", "images", "asteroide.png")).convert(), (50, 50))
-            self.radius = 25
-        if self.img_aleatoria == 2:
-            self.image = pg.transform.scale(
-                pg.image.load(os.path.join(
-                    "resources", "images", "asteroide.png")).convert(), (25, 25))
-            self.radius = 12
-        self.image.set_colorkey((0, 0, 0))
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(ANCHO_P - self.rect.width)
-        self.rect.y = random.randrange(ALTO_P - self.rect.height)
-        self.rect.x -= self.rect.width
-        self.velocidad_x = random.randrange(4, 10)
+        
+        
         """
