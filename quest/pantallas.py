@@ -65,7 +65,6 @@ class PantallaJuego(Pantalla):
         super().__init__(pantalla)
         self.player = Nave()
         self.crear_meteoritos()
-        
 
     def bucle_principal(self):
         self.reloj.tick(FPS)
@@ -78,12 +77,14 @@ class PantallaJuego(Pantalla):
             self.pintar_fondo()
 
             # Para mover y pintar la nave
-            self.player.update()
             self.pantalla.blit(self.player.image, self.player.rect)
+            self.player.update()
+
+            # Para actualizar y dibujar el meteorito
             self.meteoritos.draw(self.pantalla)
             self.meteoritos.update()
-            # Para actualizar y dibujar el meteorito
 
+            # Camino futuro para la colisión de nave con meteorito
             """
             self.hit = pg.sprite.spritecollide(
                 self.player, self.meteoritos, False)
@@ -91,24 +92,19 @@ class PantallaJuego(Pantalla):
                 self.player.image.set_alpha(0)
             """
 
-            
             pg.display.flip()
 
     def pintar_fondo(self):
         self.fondo = pg.image.load(os.path.join(
-            "resources", "images", "espacio.jpeg"))
+            "resources", "images", "espacio.jpeg")).convert()
         self.pantalla.blit(self.fondo, (0, 0))
 
     def crear_meteoritos(self):
         self.meteoritos = pg.sprite.Group()
         self.meteoritos.empty()
-        num_meteoritos = 6
         margen_y = 20
 
-        for i in range(num_meteoritos):
+        for i in range(6):
             self.meteorito = Asteroide()
             self.meteorito.rect.y += margen_y
             self.meteoritos.add(self.meteorito)
-        
-        
-        

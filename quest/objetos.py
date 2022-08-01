@@ -36,7 +36,7 @@ class Asteroide(Sprite):
         super().__init__()
         self.w = 128
         self.h = 128       
-        self.image = pg.Surface((self.w, self.h), pg.SRCALPHA, 32)
+        self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
         self.rect = self.image.get_rect()
         self.rect.x = ANCHO_P - self.rect.width
         self.rect.y = random.randrange(ALTO_P-self.rect.height)
@@ -62,13 +62,11 @@ class Asteroide(Sprite):
                 image = pg.Surface((self.w, self.h), pg.SRCALPHA)
                 image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
                 self.frames.append(image)
-        
 
         self.how_many = len(self.frames)
         self.image = self.frames[self.index]
 
-
-
+        
     def animarFrames(self):
         self.current_time += self.animation_time
         if self.current_time > FPS:
@@ -87,6 +85,8 @@ class Asteroide(Sprite):
         self.loadFrames()
         self.animarFrames()
 
+        
+
         self.velocidad_x = random.randrange(5, 10)
         self.rect.x -= self.velocidad_x
 
@@ -100,10 +100,18 @@ class Asteroide(Sprite):
         if self.rect.y < 0:
             self.rect.y = 0
 
-            #self.velocidad_x = random.randrange(5, 15)
+            
 
         # Comentado, primera solución que tuve para hacer meteoritos de diferentes tamaños: no funciona
         """
-        
-        
+        self.imagen_aleatoria = random.randrange(3)
+        if self.imagen_aleatoria == 0:
+            pg.transform.scale(self.image,(100,100))
+            self.radius = 25
+        if self.imagen_aleatoria == 1:
+            pg.transform.scale(self.image,(50,50))
+            self.radius = 12.5
+        if self.imagen_aleatoria == 2:
+            pg.transform.scale(self.image, (25, 25))
+            self.radius = 7
         """
