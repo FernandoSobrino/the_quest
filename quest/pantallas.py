@@ -99,12 +99,13 @@ class PantallaJuego(Pantalla):
             "resources", "images", "espacio.jpeg")).convert()
         self.pantalla.blit(self.fondo, (0, 0))
 
+    
     def crear_meteoritos(self):
         self.meteoritos = pg.sprite.Group()
         self.meteoritos.empty()
-        margen_y = 20
+        #margen_y = 30
 
-        for i in range(6):
+        for i in range(random.randint(0,6)):
             self.meteorito = Asteroide()
-            self.meteorito.rect.y += margen_y
             self.meteoritos.add(self.meteorito)
+            
