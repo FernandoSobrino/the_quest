@@ -2,9 +2,9 @@ import os
 import pygame as pg
 import random
 
-from quest import ANCHO_P, ALTO_P, COLOR_AMARILLO, FPS
+from . import ANCHO_P, ALTO_P, COLOR_AMARILLO, FPS
 
-from .objetos import Nave, Asteroide
+from .objetos import MeteoritoMediano, Nave, Meteorito, MeteoritoPequenio
 
 
 class Pantalla:
@@ -99,13 +99,18 @@ class PantallaJuego(Pantalla):
             "resources", "images", "espacio.jpeg")).convert()
         self.pantalla.blit(self.fondo, (0, 0))
 
-    
     def crear_meteoritos(self):
         self.meteoritos = pg.sprite.Group()
         self.meteoritos.empty()
-        #margen_y = 30
+        margen_y = 20
 
-        for i in range(random.randint(0,6)):
-            self.meteorito = Asteroide()
+        for i in range(1):
+            self.meteorito = Meteorito()
             self.meteoritos.add(self.meteorito)
-            
+        for i in range(2):
+            self.meteorito_mediano = MeteoritoMediano()
+            self.meteorito.rect.y += margen_y
+            self.meteoritos.add(self.meteorito_mediano)
+        for i in range(4):
+            self.meteorito_pequenio = MeteoritoPequenio()
+            self.meteoritos.add(self.meteorito_pequenio)

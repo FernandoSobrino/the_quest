@@ -31,7 +31,7 @@ class Nave(Sprite):
                 self.rect.bottom = ALTO_P
 
 
-class Asteroide(Sprite):
+class Meteorito(Sprite):
     def __init__(self):
         super().__init__()
         self.w = 128
@@ -61,26 +61,9 @@ class Asteroide(Sprite):
                 image = pg.Surface((self.w, self.h), pg.SRCALPHA)
                 image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
                 self.frames.append(image)
-                
-        
 
         self.how_many = len(self.frames)
         self.image = self.frames[self.index]
-
-        
-    
-    def tamaño_frames(self):
-        self.img_aleatoria = random.randrange(3)
-        if self.img_aleatoria == 0:
-            self.image = pg.transform.scale((self.image).convert(), (100, 100))
-        if self.img_aleatoria == 1:
-            self.image = pg.transform.scale(
-                (self.image).convert(), (50, 50))
-        if self.img_aleatoria == 2:
-            self.image = pg.transform.scale(
-                (self.image).convert(), (25, 25))
-        
-
 
     def animarFrames(self):
         self.current_time += self.animation_time
@@ -92,19 +75,16 @@ class Asteroide(Sprite):
                 self.index = 0
 
             self.image = self.frames[self.index]
-            
 
     def update(self):
         self.loadFrames()
-        self.tamaño_frames()
         self.animarFrames()
-        
-        
-        self.velocidad_x = random.randrange(6, 10)
+
+        self.velocidad_x = random.randrange(1, 4)
         self.rect.x -= self.velocidad_x
 
         if self.rect.right < 0:
-            self.rect.x = ANCHO_P - self.rect.width
+            self.rect.x = ANCHO_P
             self.rect.y = random.randrange(ALTO_P - self.rect.height)
             self.rect.x -= self.rect.width
 
@@ -113,18 +93,128 @@ class Asteroide(Sprite):
         if self.rect.y < 0:
             self.rect.y = 0
 
-        
 
-        # Comentado, primera solución que tuve para hacer meteoritos de diferentes tamaños: no funciona
-        """
-        self.imagen_aleatoria = random.randrange(3)
-        if self.imagen_aleatoria == 0:
-            pg.transform.scale(self.image,(100,100))
-            self.radius = 25
-        if self.imagen_aleatoria == 1:
-            pg.transform.scale(self.image,(50,50))
-            self.radius = 12.5
-        if self.imagen_aleatoria == 2:
-            pg.transform.scale(self.image, (25, 25))
-            self.radius = 7
-        """
+class MeteoritoMediano(Sprite):
+    def __init__(self):
+        super().__init__()
+        self.w = 96
+        self.h = 96
+        self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+        self.rect = self.image.get_rect()
+        self.rect.x = ANCHO_P - self.rect.width
+        self.rect.y = random.randrange(ALTO_P-self.rect.height)
+
+        # Almacenar los frames
+        self.frames = []
+        self.index = 0
+        self.how_many = 0
+        self.animation_time = FPS // 2
+
+        self.current_time = 0
+
+    def loadFrames(self):
+
+        sprite_sheet = pg.image.load(os.path.join(
+            "resources", "images", "asteroids_medium.png"))
+
+        for fila in range(5, 8):
+            y = fila * self.h
+            for columna in range(8):
+                x = columna * self.w
+                image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+                image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
+                self.frames.append(image)
+
+        self.how_many = len(self.frames)
+        self.image = self.frames[self.index]
+
+    def animarFrames(self):
+        self.current_time += self.animation_time
+        if self.current_time > FPS:
+            self.current_time = 0
+            self.index += 1
+
+            if self.index >= self.how_many:
+                self.index = 0
+
+            self.image = self.frames[self.index]
+
+    def update(self):
+        self.loadFrames()
+        self.animarFrames()
+
+        self.velocidad_x = random.randrange(3, 6)
+        self.rect.x -= self.velocidad_x
+
+        if self.rect.right < 0:
+            self.rect.x = ANCHO_P
+            self.rect.y = random.randrange(ALTO_P - self.rect.height)
+            self.rect.x -= self.rect.width
+
+        if self.rect.y > ALTO_P:
+            self.rect.y = ALTO_P - 30
+        if self.rect.y < 0:
+            self.rect.y = 0
+
+
+class MeteoritoPequenio(Sprite):
+    def __init__(self):
+        super().__init__()
+        self.w = 41.5
+        self.h = 50
+        self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+        self.rect = self.image.get_rect()
+        self.rect.x = ANCHO_P - self.rect.width
+        self.rect.y = random.randrange(ALTO_P-self.rect.height)
+
+        # Almacenar los frames
+        self.frames = []
+        self.index = 0
+        self.how_many = 0
+        self.animation_time = FPS // 2
+
+        self.current_time = 0
+
+    def loadFrames(self):
+
+        sprite_sheet = pg.image.load(os.path.join(
+            "resources", "images", "asteroids_usmall.png"))
+
+        for fila in range(5):
+            y = fila * self.h
+            for columna in range(6):
+                x = columna * self.w
+                image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+                image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
+                self.frames.append(image)
+
+        self.how_many = len(self.frames)
+        self.image = self.frames[self.index]
+
+    def animarFrames(self):
+        self.current_time += self.animation_time
+        if self.current_time > FPS:
+            self.current_time = 0
+            self.index += 1
+
+            if self.index >= self.how_many:
+                self.index = 0
+
+            self.image = self.frames[self.index]
+
+    def update(self):
+        self.loadFrames()
+        self.animarFrames()
+
+        self.velocidad_x = random.randrange(7, 10)
+        self.rect.x -= self.velocidad_x
+
+        if self.rect.right < 0:
+            self.rect.x = ANCHO_P
+            self.rect.x -= self.rect.width
+            self.rect.y = random.randrange(ALTO_P - self.rect.height)
+
+        if self.rect.y > ALTO_P:
+            self.rect.y = ALTO_P - 30
+        if self.rect.y < 0:
+            self.rect.y = 0
