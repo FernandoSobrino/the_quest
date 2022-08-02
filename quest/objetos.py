@@ -40,6 +40,10 @@ class Meteorito(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = ANCHO_P - self.rect.width
         self.rect.y = random.randrange(ALTO_P-self.rect.height)
+        if self.rect.bottom == ALTO_P:
+            self.rect.y = ALTO_P - 100
+        if self.rect.top == 0:
+            self.rect.top = 0
 
         # Almacenar los frames
         self.frames = []
@@ -88,10 +92,7 @@ class Meteorito(Sprite):
             self.rect.y = random.randrange(ALTO_P - self.rect.height)
             self.rect.x -= self.rect.width
 
-        if self.rect.y > ALTO_P:
-            self.rect.y = ALTO_P - 30
-        if self.rect.y < 0:
-            self.rect.y = 0
+        
 
 
 class MeteoritoMediano(Sprite):
@@ -103,12 +104,16 @@ class MeteoritoMediano(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = ANCHO_P - self.rect.width
         self.rect.y = random.randrange(ALTO_P-self.rect.height)
+        if self.rect.bottom == ALTO_P:
+            self.rect.y = ALTO_P - 100
+        if self.rect.top == 0:
+            self.rect.top = 0
 
         # Almacenar los frames
         self.frames = []
         self.index = 0
         self.how_many = 0
-        self.animation_time = FPS // 2
+        self.animation_time = FPS // 3
 
         self.current_time = 0
 
@@ -151,10 +156,7 @@ class MeteoritoMediano(Sprite):
             self.rect.y = random.randrange(ALTO_P - self.rect.height)
             self.rect.x -= self.rect.width
 
-        if self.rect.y > ALTO_P:
-            self.rect.y = ALTO_P - 30
-        if self.rect.y < 0:
-            self.rect.y = 0
+        
 
 
 class MeteoritoPequenio(Sprite):
@@ -166,12 +168,16 @@ class MeteoritoPequenio(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = ANCHO_P - self.rect.width
         self.rect.y = random.randrange(ALTO_P-self.rect.height)
+        if self.rect.bottom == ALTO_P:
+            self.rect.y = ALTO_P - 100
+        if self.rect.top == 0:
+            self.rect.top = 0
 
         # Almacenar los frames
         self.frames = []
         self.index = 0
         self.how_many = 0
-        self.animation_time = FPS // 2
+        self.animation_time = FPS // 4
 
         self.current_time = 0
 
@@ -214,7 +220,4 @@ class MeteoritoPequenio(Sprite):
             self.rect.x -= self.rect.width
             self.rect.y = random.randrange(ALTO_P - self.rect.height)
 
-        if self.rect.y > ALTO_P:
-            self.rect.y = ALTO_P - 30
-        if self.rect.y < 0:
-            self.rect.y = 0
+        
