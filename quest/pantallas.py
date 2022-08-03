@@ -40,6 +40,7 @@ class PantallaPrincipal(Pantalla):
             self.pantalla.fill((0, 0, 0))
             self.pintar_texto_titulo()
             self.pintar_texto_partida()
+            self.pintar_texto_instrucciones()
             pg.display.flip()
 
     def pintar_texto_titulo(self):
@@ -47,7 +48,7 @@ class PantallaPrincipal(Pantalla):
         texto = self.tipografia.render(mensaje, True, COLOR_AMARILLO)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
-        pos_y = ALTO_P/4
+        pos_y = ALTO_P/8
         self.pantalla.blit(texto, (pos_x, pos_y))
 
     def pintar_texto_partida(self):
@@ -55,8 +56,34 @@ class PantallaPrincipal(Pantalla):
         texto = self.tipo_titulo.render(mensaje, True, COLOR_AMARILLO)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
-        pos_y = ALTO_P - 150
+        pos_y = ALTO_P - 75
         self.pantalla.blit(texto, (pos_x, pos_y))
+
+    def pintar_texto_instrucciones(self):
+        mensaje = "Como jugar:"
+        mensaje2 = "- Pulsa ARRIBA/ABAJO para mover la nave"
+        mensaje3 = "- Esquiva los meteoritos para ganar puntos"
+        mensaje4 = "- Tienes 3 vidas. Pierdes vidas si chocas con los meteoritos"
+        texto = self.tipo_titulo.render(mensaje, True, COLOR_AMARILLO)
+        texto2 = self.tipo_titulo.render(mensaje2, True, COLOR_AMARILLO)
+        texto3 = self.tipo_titulo.render(mensaje3, True, COLOR_AMARILLO)
+        texto4 = self.tipo_titulo.render(mensaje4, True, COLOR_AMARILLO)
+        ancho_texto = texto.get_width()
+        ancho_texto2 = texto2.get_width()
+        ancho_texto3 = texto3.get_width()
+        ancho_texto4 = texto4.get_width()
+        pos_x = (ANCHO_P - ancho_texto)/3
+        pos_x2 = (ANCHO_P - ancho_texto2)/3
+        pos_x3 = (ANCHO_P - ancho_texto3)/3
+        pos_x4 = (ANCHO_P - ancho_texto4)/3
+        pos_y = ALTO_P - 400
+        pos_y_2 = ALTO_P - 350
+        pos_y_3 = ALTO_P - 300
+        pos_y_4 = ALTO_P - 250
+        self.pantalla.blit(texto, (pos_x, pos_y))
+        self.pantalla.blit(texto2, (pos_x2, pos_y_2))
+        self.pantalla.blit(texto3, (pos_x3, pos_y_3))
+        self.pantalla.blit(texto4, (pos_x4, pos_y_4))
 
 
 class PantallaJuego(Pantalla):
@@ -102,15 +129,17 @@ class PantallaJuego(Pantalla):
     def crear_meteoritos(self):
         self.meteoritos = pg.sprite.Group()
         self.meteoritos.empty()
-        margen_y = 20
+        margen_y = 40
 
         for i in range(1):
             self.meteorito = Meteorito()
+            self.meteorito.rect.y -= margen_y
             self.meteoritos.add(self.meteorito)
         for i in range(2):
             self.meteorito_mediano = MeteoritoMediano()
-            self.meteorito.rect.y += margen_y
+            self.meteorito.rect.y -= margen_y
             self.meteoritos.add(self.meteorito_mediano)
         for i in range(4):
             self.meteorito_pequenio = MeteoritoPequenio()
+            self.meteorito.rect.y -= margen_y
             self.meteoritos.add(self.meteorito_pequenio)
