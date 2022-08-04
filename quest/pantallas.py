@@ -1,8 +1,7 @@
 import os
 import pygame as pg
-import random
 
-from . import ANCHO_P, ALTO_P, COLOR_AMARILLO, FPS
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS
 
 from .objetos import MeteoritoMediano, Nave, Meteorito, MeteoritoPequenio
 
@@ -25,8 +24,8 @@ class PantallaPrincipal(Pantalla):
                                   "game_sans_serif_7.ttf")
         self.tipografia = pg.font.Font(font_file, 100)
         self.tipo_juego = pg.font.Font(font_file2, 30)
-        self.tipo_info = pg.font.Font(font_file2, 15)
-
+        self.tipo_info = pg.font.Font(font_file2, 20)
+        
 
     def bucle_principal(self):
         self.reloj.tick(FPS)
@@ -50,27 +49,27 @@ class PantallaPrincipal(Pantalla):
         self.fondo = pg.image.load(os.path.join(
             "resources", "images", "fondo1.jpg")).convert()
         self.pantalla.blit(self.fondo, (0, 0))
-    
+
     def pintar_texto_instrucciones(self):
 
-        posiciones = [300, 350, 400, 450]
-        mensajes = ["Como jugar:", "- Pulsa ARRIBA/ABAJO para mover la nave",
-                    "- Esquiva los meteoritos para ganar puntos", "- Tienes 3 vidas."
-                    "Pierdes vidas si chocas con los meteoritos"]
+        posiciones = [325, 400, 450, 500]
+        mensajes = ["Como jugar:", "- Pulsa ARRIBA/ABAJO para mover la nave.",
+                    "- Esquiva los meteoritos para ganar puntos.", "- Tienes 3 vidas. "
+                    "Pierdes vidas si chocas con los meteoritos."]
+
         conta_posiciones = 0
-        pos_x = ANCHO_P - 730
+        pos_x = ANCHO_P - 800
 
         for mensaje in mensajes:
-            print(mensaje)
             texto_render = self.tipo_info.render(
-                (mensaje), True, COLOR_AMARILLO)
+                (mensaje), True, COLOR_TEXTO)
             self.pantalla.blit(
                 texto_render, (pos_x, posiciones[conta_posiciones]))
             conta_posiciones += 1
 
     def pintar_texto_partida(self):
         mensaje = "Pulsa 'ESPACIO' para comenzar la partida"
-        texto = self.tipo_juego.render(mensaje, True, COLOR_AMARILLO)
+        texto = self.tipo_juego.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
         pos_y = ALTO_P - 75
@@ -78,15 +77,12 @@ class PantallaPrincipal(Pantalla):
 
     def pintar_texto_titulo(self):
         mensaje = "THE QUEST"
-        texto = self.tipografia.render(mensaje, True, COLOR_AMARILLO)
+        texto = self.tipografia.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
         pos_y = ALTO_P/8
         self.pantalla.blit(texto, (pos_x, pos_y))
 
-    
-
-    
 
 class PantallaJuego(Pantalla):
 
