@@ -1,9 +1,10 @@
 import os
 import pygame as pg
+import random
 
 from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS
 
-from .objetos import MeteoritoMediano, Nave, Meteorito, MeteoritoPequenio
+from .objetos import Nave, Meteorito, Explosion
 
 
 class Pantalla:
@@ -25,10 +26,8 @@ class PantallaPrincipal(Pantalla):
         self.tipografia = pg.font.Font(font_file, 100)
         self.tipo_juego = pg.font.Font(font_file2, 30)
         self.tipo_info = pg.font.Font(font_file2, 20)
-        
 
     def bucle_principal(self):
-        self.reloj.tick(FPS)
         # pg.mixer.music.play()
         salir = False
         while not salir:
@@ -57,8 +56,8 @@ class PantallaPrincipal(Pantalla):
                     "- Esquiva los meteoritos para ganar puntos.", "- Tienes 3 vidas. "
                     "Pierdes vidas si chocas con los meteoritos."]
 
-        conta_posiciones = 0
         pos_x = ANCHO_P - 800
+        conta_posiciones = 0
 
         for mensaje in mensajes:
             texto_render = self.tipo_info.render(
@@ -92,9 +91,11 @@ class PantallaJuego(Pantalla):
         self.crear_meteoritos()
 
     def bucle_principal(self):
-        self.reloj.tick(FPS)
         salir = False
         while not salir:
+            self.reloj.tick(FPS)
+            tiempo_fps = self.reloj.get_fps()
+            print(tiempo_fps)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     salir = True
@@ -104,18 +105,28 @@ class PantallaJuego(Pantalla):
             # Para mover y pintar la nave
             self.pantalla.blit(self.player.image, self.player.rect)
             self.player.update()
-
+            
+        
             # Para actualizar y dibujar el meteorito
             self.meteoritos.draw(self.pantalla)
             self.meteoritos.update()
 
-            # Camino futuro para la colisión de nave con meteorito
-            """
+            # Colisión de la nave con meteorito y aparece explosion
             self.hit = pg.sprite.spritecollide(
-                self.player, self.meteoritos, False)
+                self.player, self.meteoritos, True)
+            
             if self.hit:
-                self.player.image.set_alpha(0)
-            """
+                self.explosion = Explosion()
+                self.pantalla.blit(self.explosion.image,self.player.rect)
+            
+
+            #Para sacar meteoritos del grupo una vez llegan al final de la pantalla
+            self.regenerar_meteoritos()
+
+            # Instanciar nuevos meteoritos cuando se acaben
+            if len(self.meteoritos.sprites()) == 0:
+                self.crear_meteoritos()
+
 
             pg.display.flip()
 
@@ -124,20 +135,24 @@ class PantallaJuego(Pantalla):
             "resources", "images", "espacio.jpeg")).convert()
         self.pantalla.blit(self.fondo, (0, 0))
 
+
     def crear_meteoritos(self):
         self.meteoritos = pg.sprite.Group()
         self.meteoritos.empty()
         margen_y = 40
+        cantidad_meteoritos = random.randrange(4)
 
-        for i in range(1):
+        for i in range(cantidad_meteoritos):
             self.meteorito = Meteorito()
             self.meteorito.rect.y -= margen_y
+            self.meteorito.rect.y = random.randrange(ALTO_P - self.meteorito.rect.height)
             self.meteoritos.add(self.meteorito)
-        for i in range(2):
-            self.meteorito_mediano = MeteoritoMediano()
-            self.meteorito.rect.y -= margen_y
-            self.meteoritos.add(self.meteorito_mediano)
-        for i in range(4):
-            self.meteorito_pequenio = MeteoritoPequenio()
-            self.meteorito.rect.y -= margen_y
-            self.meteoritos.add(self.meteorito_pequenio)
+            
+    
+    def regenerar_meteoritos(self):
+        if self.meteorito.rect.right < 0:
+            self.meteorito.kill()
+        if not self.meteorito.alive():
+            self.crear_meteoritos()
+            
+        
