@@ -43,15 +43,13 @@ class Meteorito(Sprite):
         self.rect.y = random.randrange(ALTO_P-self.rect.height)
 
         # Almacenar los frames
-        self.frames = []
-        self.index = 0
-        self.how_many = 0
-        self.animation_time = FPS // 4
+        self.imagenes = []
+        self.contador = 0
+        self.tiempo_animacion = FPS // 4
+        self.momento_actual = 0
+        self.cargarFrames()
 
-        self.current_time = 0
-        self.loadFrames()
-
-    def loadFrames(self):
+    def cargarFrames(self):
         """Este método sirve para cargar las imágenes que harán el efecto de que
         el meteorito gire sobre sí mismo al desplazarse"""
 
@@ -64,22 +62,23 @@ class Meteorito(Sprite):
                 x = columna * self.w
                 image = pg.Surface((self.w, self.h), pg.SRCALPHA)
                 image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
-                self.frames.append(image)
+                self.imagenes.append(image)
 
-                self.how_many = len(self.frames)
-                self.image = self.frames[self.index]
+                self.siguiente_imagen = 0
+                self.siguiente_imagen = len(self.imagenes)
+                self.image = self.imagenes[self.contador]
 
     def update(self):
         # para animar los frames de la imagen del meteorito
-        self.current_time += self.animation_time
-        if self.current_time > FPS:
-            self.current_time = 0
-            self.index += 1
+        self.momento_actual += self.tiempo_animacion
+        if self.momento_actual == FPS:
+            self.momento_actual = 0
+            self.contador += 1
 
-            if self.index >= self.how_many:
-                self.index = 0
+            if self.contador >= self.siguiente_imagen:
+                self.contador = 0
 
-            self.image = self.frames[self.index]
+            self.image = self.imagenes[self.contador]
 
         # controla la velocidad del meteorito
         self.velocidad_x = random.randrange(2, 5)
@@ -92,17 +91,24 @@ class Meteorito(Sprite):
             self.rect.top = 0
 
 
-class MeteoritoMediano(Meteorito):
+class MeteoritoMediano(Sprite):
     def __init__(self):
         super().__init__()
         self.w = 96
         self.h = 96
+        self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+        self.rect = self.image.get_rect()
+        self.rect.x = ANCHO_P - self.rect.width
+        self.rect.y = random.randrange(ALTO_P-self.rect.height)
 
-        # Cambio del tiempo de animación según la clase padre Meteorito
-        self.animation_time = FPS // 4
-        self.loadFrames()
+        # Almacenar los frames
+        self.imagenes = []
+        self.contador = 0
+        self.tiempo_animacion = FPS // 3
+        self.momento_actual = 0
+        self.cargarFrames()
 
-    def loadFrames(self):
+    def cargarFrames(self):
 
         sprite_sheet = pg.image.load(os.path.join(
             "resources", "images", "asteroids_medium.png"))
@@ -113,14 +119,24 @@ class MeteoritoMediano(Meteorito):
                 x = columna * self.w
                 image = pg.Surface((self.w, self.h), pg.SRCALPHA)
                 image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
-                self.frames.append(image)
+                self.imagenes.append(image)
 
-        self.how_many = len(self.frames)
-        self.image = self.frames[self.index]
+        self.siguiente_imagen = 0
+        self.siguiente_imagen = len(self.imagenes)
+        self.image = self.imagenes[self.contador]
 
     def update(self):
+        self.momento_actual += self.tiempo_animacion
+        if self.momento_actual > FPS:
+            self.momento_actual = 0
+            self.contador += 1
 
-        self.velocidad_x = random.randrange(5, 10)
+            if self.contador >= self.siguiente_imagen:
+                self.contador = 0
+
+            self.image = self.imagenes[self.contador]
+
+        self.velocidad_x = random.randrange(3, 7)
         self.rect.x -= self.velocidad_x
 
         if self.rect.bottom == ALTO_P:
@@ -131,13 +147,14 @@ class MeteoritoMediano(Meteorito):
 
 
 class MeteoritoPequenio(Meteorito):
+    "Clase a contruir o eliminar (NO ACTIVA)"
     def __init__(self):
         super().__init__()
         self.w = 41.5
         self.h = 50
 
         # Cambio del tiempo de animación según la clase padre Meteorito
-        self.animation_time = FPS // 6
+        self.animation_time = FPS // 2
         self.loadFrames()
 
     def loadFrames(self):
@@ -151,14 +168,23 @@ class MeteoritoPequenio(Meteorito):
                 x = columna * self.w
                 image = pg.Surface((self.w, self.h), pg.SRCALPHA)
                 image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
-                self.frames.append(image)
+                self.imagenes.append(image)
 
-        self.how_many = len(self.frames)
-        self.image = self.frames[self.index]
+        self.how_many = len(self.imagenes)
+        self.image = self.imagenes[self.index]
 
     def update(self):
+        self.current_time += self.animation_time
+        if self.current_time > FPS:
+            self.current_time = 0
+            self.index += 1
 
-        self.velocidad_x = random.randrange(7, 12)
+            if self.index >= self.how_many:
+                self.index = 0
+
+            self.image = self.imagenes[self.index]
+
+        self.velocidad_x = random.randrange(5, 9)
         self.rect.x -= self.velocidad_x
 
         if self.rect.bottom == ALTO_P:
@@ -169,6 +195,7 @@ class MeteoritoPequenio(Meteorito):
 
 
 class Explosion(Sprite):
+    "Clase a construir (ACTIVA PERO MEJORABLE)"
     def __init__(self):
         super().__init__()
         self.w = 100
@@ -180,7 +207,7 @@ class Explosion(Sprite):
         self.frames = []
         self.index = 0
         self.how_many = 0
-        self.animation_time = FPS // 8
+        self.animation_time = FPS // 16
 
         self.current_time = 0
         self.loadFrames()
