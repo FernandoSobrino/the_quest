@@ -81,14 +81,14 @@ class Meteorito(Sprite):
             self.image = self.imagenes[self.contador]
 
         # controla la velocidad del meteorito
-        self.velocidad_x = random.randrange(2, 5)
+        self.velocidad_x = random.randrange(3, 5)
         self.rect.x -= self.velocidad_x
 
         # controla que el meteorito no se salga por abajo(un margen) y por arriba
         if self.rect.bottom == ALTO_P:
-            self.rect.y = ALTO_P - 100
+            self.rect.y = ALTO_P
         if self.rect.top == 0:
-            self.rect.top = 0
+            self.rect.y = 0
 
 
 class MeteoritoMediano(Sprite):
@@ -140,14 +140,15 @@ class MeteoritoMediano(Sprite):
         self.rect.x -= self.velocidad_x
 
         if self.rect.bottom == ALTO_P:
-            self.rect.y = ALTO_P - 100
+            self.rect.y = ALTO_P
         if self.rect.top == 0:
-            self.rect.top = 0
+            self.rect.top += 150
 # clase a construir o a eliminar
 
 
 class MeteoritoPequenio(Meteorito):
     "Clase a contruir o eliminar (NO ACTIVA)"
+
     def __init__(self):
         super().__init__()
         self.w = 41.5
@@ -196,6 +197,7 @@ class MeteoritoPequenio(Meteorito):
 
 class Explosion(Sprite):
     "Clase a construir (ACTIVA PERO MEJORABLE)"
+
     def __init__(self):
         super().__init__()
         self.w = 100
