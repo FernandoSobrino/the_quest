@@ -122,8 +122,8 @@ class PantallaJuego(Pantalla):
             # Para sacar meteoritos del grupo una vez llegan al final de la pantalla y vuelve a crearlos
             self.regenerar_meteoritos()
             self.regenerar_meteoritos_m()
-            
-            #Recarga de todos los elementos que funcionan en el juego
+
+            # Recarga de todos los elementos que funcionan en el juego
             pg.display.flip()
 
     def pintar_fondo(self):
@@ -132,22 +132,18 @@ class PantallaJuego(Pantalla):
             "resources", "images", "espacio.jpeg")).convert()
         self.pantalla.blit(self.fondo, (0, 0))
 
-    
-    
-    
     def crear_meteoritos(self):
         """"Este método genera los meteoritos grandes al inicio de la partida y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
         cantidad_meteoritos = random.randrange(1, 3)
         for i in range(cantidad_meteoritos):
             self.meteorito = Meteorito()
-        self.meteoritos.add(self.meteorito)
+            self.meteoritos.add(self.meteorito)
 
-    
     def crear_meteoritos_m(self):
         """"Este método genera los meteoritos medianos al inicio de la partida y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos = random.randrange(1, 3)
+        cantidad_meteoritos = random.randrange(2, 5)
         for i in range(cantidad_meteoritos):
             self.meteorito_m = MeteoritoMediano()
             self.meteoritos.add(self.meteorito_m)
