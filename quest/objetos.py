@@ -19,6 +19,14 @@ class Nave(Sprite):
         self.rect.centery = ALTO_P/2
         self.rect.x = self.margen_lateral
 
+    def ha_colisionado(self,otro,otro2):
+        if self.rect.colliderect(otro):
+            self.image.set_alpha(0)
+        if self.rect.colliderect(otro2):
+            self.image.set_alpha(0)
+
+
+
     def update(self):
         "Estos son los controles que permiten mover la nave"
         tecla_mov = pg.key.get_pressed()
@@ -121,8 +129,8 @@ class MeteoritoMediano(Sprite):
                 image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
                 self.imagenes.append(image)
 
-        self.siguiente_imagen = 0
-        self.siguiente_imagen = len(self.imagenes)
+        self.imagenes_cargadas = 0
+        self.imagenes_cargadas = len(self.imagenes)
         self.image = self.imagenes[self.contador]
 
     def update(self):
@@ -131,7 +139,7 @@ class MeteoritoMediano(Sprite):
             self.momento_actual = 0
             self.contador += 1
 
-            if self.contador >= self.siguiente_imagen:
+            if self.contador >= self.imagenes_cargadas:
                 self.contador = 0
 
             self.image = self.imagenes[self.contador]
@@ -147,7 +155,7 @@ class MeteoritoMediano(Sprite):
 
 
 class MeteoritoPequenio(Meteorito):
-    "Clase a contruir o eliminar (NO ACTIVA)"
+    "Clase a construir o eliminar (NO ACTIVA)"
 
     def __init__(self):
         super().__init__()
@@ -196,25 +204,26 @@ class MeteoritoPequenio(Meteorito):
 
 
 class Explosion(Sprite):
+    colision = False
     "Clase a construir (ACTIVA PERO MEJORABLE)"
 
-    def __init__(self):
+    def __init__(self,centro):
         super().__init__()
         self.w = 100
         self.h = 100
         self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
         self.rect = self.image.get_rect()
+        self.rect.center = centro
 
         # Almacenar los frames
-        self.frames = []
-        self.index = 0
-        self.how_many = 0
-        self.animation_time = FPS // 16
+        self.imagenes = []
+        self.contador = 0
+        self.tiempo_animacion = FPS // 3
 
-        self.current_time = 0
-        self.loadFrames()
+        self.momento_actual = pg.time.get_ticks()
+        self.cargarFrames()
 
-    def loadFrames(self):
+    def cargarFrames(self):
 
         sprite_sheet = pg.image.load(os.path.join(
             "resources", "images", "explosion_nueva.png"))
@@ -225,18 +234,18 @@ class Explosion(Sprite):
                 x = columna * self.w
                 image = pg.Surface((self.w, self.h), pg.SRCALPHA)
                 image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
-                self.frames.append(image)
+                self.imagenes.append(image)
 
-        self.how_many = len(self.frames)
-        self.image = self.frames[self.index]
+        self.image = self.imagenes[self.contador]
 
     def update(self):
-        self.current_time += self.animation_time
-        if self.current_time > FPS:
-            self.current_time = 0
-            self.index += 1
-
-            if self.index >= self.how_many:
-                self.index = 0
-
-            self.image = self.frames[self.index]
+        ahora = pg.time.get_ticks()
+        if ahora - self.momento_actual > self.tiempo_animacion:
+            self.contador += 1
+            self.momento_actual = ahora
+            if self.contador == len(self.imagenes):
+                self.kill()
+            else:
+                centro = self.rect.center
+                self.image = self.imagenes[self.contador]
+                self.rect.center = centro

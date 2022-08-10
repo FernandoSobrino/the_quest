@@ -89,15 +89,18 @@ class PantallaJuego(Pantalla):
         super().__init__(pantalla)
         self.player = Nave()
         self.meteoritos = pg.sprite.Group()
+        self.explosiones = pg.sprite.Group()
         self.crear_meteoritos()
         self.crear_meteoritos_m()
+        self.exp_sound = pg.mixer.Sound(os.path.join(
+            "resources", "sounds", "explosion_eco.wav"))
 
     def bucle_principal(self):
         salir = False
         while not salir:
             self.reloj.tick(FPS)
             tiempo_fps = self.reloj.get_fps()
-            print(tiempo_fps)
+            # print(tiempo_fps)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     salir = True
@@ -112,12 +115,17 @@ class PantallaJuego(Pantalla):
             self.meteoritos.draw(self.pantalla)
             self.meteoritos.update()
 
+            self.explosiones.draw(self.pantalla)
+            self.explosiones.update()
+
             # Colisión de la nave con meteorito y aparece explosion
-            self.hit = pg.sprite.spritecollide(
+            colision = pg.sprite.spritecollide(
                 self.player, self.meteoritos, True)
-            if self.hit:
-                self.explosion = Explosion()
-                self.pantalla.blit(self.explosion.image, self.player.rect)
+            if colision:
+                #self.player.ha_colisionado(self.meteorito, self.meteorito_m)
+                self.explosion = Explosion(self.player.rect.center)
+                self.exp_sound.play()
+                self.explosiones.add(self.explosion)
 
             # Para sacar meteoritos del grupo una vez llegan al final de la pantalla y vuelve a crearlos
             self.regenerar_meteoritos()
