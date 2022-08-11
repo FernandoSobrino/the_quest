@@ -94,7 +94,7 @@ class PantallaJuego(Pantalla):
         self.crear_meteoritos()
         self.crear_meteoritos_m()
         self.exp_sound = pg.mixer.Sound(os.path.join(
-            "resources", "sounds", "explosion_larga.wav"))
+            "resources", "sounds", "sonido_explosion.wav"))
 
     def bucle_principal(self):
         salir = False
@@ -108,7 +108,7 @@ class PantallaJuego(Pantalla):
 
             self.pintar_fondo()
 
-            #Pintar el marcador de vidas
+            # Pintar el marcador de vidas
             self.contador_vidas.pintar_marcador_vidas(self.pantalla)
 
             # Para mover y pintar la nave
@@ -141,8 +141,7 @@ class PantallaJuego(Pantalla):
 
             if self.contador_vidas.vidas == 0:
                 salir = True
-        
-            
+
     def pintar_fondo(self):
         "Este método pinta el fondo de estrellas de la pantalla del juego"
         self.fondo = pg.image.load(os.path.join(
@@ -180,6 +179,3 @@ class PantallaJuego(Pantalla):
             self.meteoritos.remove(self.meteorito_m)
         if not self.meteorito_m.alive():
             self.crear_meteoritos_m()
-
-
-
