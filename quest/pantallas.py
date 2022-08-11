@@ -2,9 +2,9 @@ import os
 import pygame as pg
 import random
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, VIDAS
 
-from .objetos import MeteoritoMediano, Nave, Meteorito, Explosion
+from .objetos import MeteoritoMediano, Nave, Meteorito, Explosion, ContadorVidas
 
 
 class Pantalla:
@@ -46,15 +46,16 @@ class PantallaPrincipal(Pantalla):
 
     def pintar_fondo(self):
         self.fondo = pg.image.load(os.path.join(
-            "resources", "images", "fondo1.jpg")).convert()
+            "resources", "images", "fondo_intro.jpg")).convert()
         self.pantalla.blit(self.fondo, (0, 0))
 
     def pintar_texto_instrucciones(self):
 
-        posiciones = [325, 400, 450, 500]
+        posiciones = [325, 400, 450, 500, 550]
         mensajes = ["Como jugar:", "- Pulsa ARRIBA/ABAJO para mover la nave.",
                     "- Esquiva los meteoritos para ganar puntos.", "- Tienes 3 vidas. "
-                    "Pierdes vidas si chocas con los meteoritos."]
+                    "Pierdes vidas si chocas con los meteoritos.",
+                    "- Aguanta el tiempo suficiente para aterrizar en el planeta."]
 
         pos_x = ANCHO_P - 800
         conta_posiciones = 0
@@ -84,16 +85,16 @@ class PantallaPrincipal(Pantalla):
 
 
 class PantallaJuego(Pantalla):
-
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
         self.player = Nave()
         self.meteoritos = pg.sprite.Group()
         self.explosiones = pg.sprite.Group()
+        self.contador_vidas = ContadorVidas(VIDAS)
         self.crear_meteoritos()
         self.crear_meteoritos_m()
         self.exp_sound = pg.mixer.Sound(os.path.join(
-            "resources", "sounds", "explosion_eco.wav"))
+            "resources", "sounds", "explosion_larga.wav"))
 
     def bucle_principal(self):
         salir = False
@@ -107,6 +108,9 @@ class PantallaJuego(Pantalla):
 
             self.pintar_fondo()
 
+            #Pintar el marcador de vidas
+            self.contador_vidas.pintar_marcador_vidas(self.pantalla)
+
             # Para mover y pintar la nave
             self.pantalla.blit(self.player.image, self.player.rect)
             self.player.update()
@@ -118,10 +122,11 @@ class PantallaJuego(Pantalla):
             self.explosiones.draw(self.pantalla)
             self.explosiones.update()
 
-            # Colisión de la nave con meteorito y aparece explosion
+            # Colisión de la nave con meteorito y aparece explosion (efecto y sonido)
             colision = pg.sprite.spritecollide(
                 self.player, self.meteoritos, True)
             if colision:
+                self.contador_vidas.perder_vida()
                 #self.player.ha_colisionado(self.meteorito, self.meteorito_m)
                 self.explosion = Explosion(self.player.rect.center)
                 self.exp_sound.play()
@@ -134,10 +139,14 @@ class PantallaJuego(Pantalla):
             # Recarga de todos los elementos que funcionan en el juego
             pg.display.flip()
 
+            if self.contador_vidas.vidas == 0:
+                salir = True
+        
+            
     def pintar_fondo(self):
         "Este método pinta el fondo de estrellas de la pantalla del juego"
         self.fondo = pg.image.load(os.path.join(
-            "resources", "images", "espacio.jpeg")).convert()
+            "resources", "images", "fondo_nivel.jpeg")).convert()
         self.pantalla.blit(self.fondo, (0, 0))
 
     def crear_meteoritos(self):
@@ -171,3 +180,6 @@ class PantallaJuego(Pantalla):
             self.meteoritos.remove(self.meteorito_m)
         if not self.meteorito_m.alive():
             self.crear_meteoritos_m()
+
+
+

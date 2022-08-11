@@ -4,12 +4,14 @@ import random
 import pygame as pg
 from pygame.sprite import Sprite
 
-from . import ANCHO_P, ALTO_P, FPS
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS
 
 
 class Nave(Sprite):
     margen_lateral = 20
     velocidad = 5
+    #perder_vida = False
+    #colision = False
 
     def __init__(self):
         super().__init__()
@@ -19,13 +21,11 @@ class Nave(Sprite):
         self.rect.centery = ALTO_P/2
         self.rect.x = self.margen_lateral
 
-    def ha_colisionado(self,otro,otro2):
+    def ha_colisionado(self, otro, otro2):
         if self.rect.colliderect(otro):
-            self.image.set_alpha(0)
+            self.colision = True
         if self.rect.colliderect(otro2):
-            self.image.set_alpha(0)
-
-
+            self.colision = True
 
     def update(self):
         "Estos son los controles que permiten mover la nave"
@@ -38,6 +38,8 @@ class Nave(Sprite):
             self.rect.y += self.velocidad
             if self.rect.bottom > ALTO_P:
                 self.rect.bottom = ALTO_P
+        if self.ha_colisionado:
+            self.perder_vida = True
 
 
 class Meteorito(Sprite):
@@ -64,6 +66,8 @@ class Meteorito(Sprite):
         sprite_sheet = pg.image.load(os.path.join(
             "resources", "images", "asteroids.png"))
 
+        """Esta parte del código recorre el sprite sheet y almacena cada
+        fotograma en una variable en forma de lista para preparar la animación"""
         for fila in range(4):
             y = fila * self.h
             for columna in range(8):
@@ -151,7 +155,7 @@ class MeteoritoMediano(Sprite):
             self.rect.y = ALTO_P
         if self.rect.top == 0:
             self.rect.top += 150
-# clase a construir o a eliminar
+
 
 
 class MeteoritoPequenio(Meteorito):
@@ -204,10 +208,9 @@ class MeteoritoPequenio(Meteorito):
 
 
 class Explosion(Sprite):
-    colision = False
     "Clase a construir (ACTIVA PERO MEJORABLE)"
 
-    def __init__(self,centro):
+    def __init__(self, centro):
         super().__init__()
         self.w = 100
         self.h = 100
@@ -218,15 +221,15 @@ class Explosion(Sprite):
         # Almacenar los frames
         self.imagenes = []
         self.contador = 0
-        self.tiempo_animacion = FPS // 3
+        self.tiempo_animacion = FPS // 2
 
-        self.momento_actual = pg.time.get_ticks()
+        self.act_tiempo = pg.time.get_ticks()
         self.cargarFrames()
 
     def cargarFrames(self):
 
         sprite_sheet = pg.image.load(os.path.join(
-            "resources", "images", "explosion_nueva.png"))
+            "resources", "images", "imagen_explosiones.png"))
 
         for fila in range(6):
             y = fila * self.h
@@ -239,13 +242,33 @@ class Explosion(Sprite):
         self.image = self.imagenes[self.contador]
 
     def update(self):
+        """Aquí se ha usado un modo distinto para animar, para probar un nuevo
+        sistema de funcionamiento. Nos basamos en los ticks del juego"""
         ahora = pg.time.get_ticks()
-        if ahora - self.momento_actual > self.tiempo_animacion:
+        if ahora - self.act_tiempo > self.tiempo_animacion:
             self.contador += 1
-            self.momento_actual = ahora
+            self.act_tiempo = ahora
             if self.contador == len(self.imagenes):
                 self.kill()
+            
             else:
-                centro = self.rect.center
                 self.image = self.imagenes[self.contador]
-                self.rect.center = centro
+                
+            
+class ContadorVidas:
+    def __init__(self, vidas_iniciales):
+        self.vidas = vidas_iniciales
+        font_file = os.path.join("resources", "fonts",
+                                 "sans_serif_plus_7.ttf")
+        self.tipografia = pg.font.Font(font_file, 20)
+
+    def perder_vida(self):
+        self.vidas -= 1
+        return self.vidas < 1
+
+    def pintar_marcador_vidas(self,pantalla):
+        texto_marcador_vidas = f"Vidas: {self.vidas}"
+        texto = self.tipografia.render(str(texto_marcador_vidas),True,COLOR_TEXTO2)
+        pos_x = texto.get_width()
+        pos_y = texto.get_height() + 20
+        pg.surface.Surface.blit(pantalla,texto,(pos_x-60,pos_y))
