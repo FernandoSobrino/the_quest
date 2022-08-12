@@ -1,10 +1,11 @@
 import os
-import pygame as pg
 import random
+
+import pygame as pg
 
 from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, VIDAS
 
-from .objetos import MeteoritoMediano, Nave, Meteorito, Explosion, ContadorVidas
+from .objetos import ContadorVidas, Explosion, Meteorito, MeteoritoMediano, Nave
 
 
 class Pantalla:
@@ -87,20 +88,34 @@ class PantallaPrincipal(Pantalla):
 class PantallaJuego(Pantalla):
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
-        self.player = Nave()
+        # creación de la nave
+        self.nave_jugador = pg.sprite.Group()
+        self.crear_jugador()
+
+        # creación de los meteoritos
         self.meteoritos = pg.sprite.Group()
-        self.explosiones = pg.sprite.Group()
-        self.contador_vidas = ContadorVidas(VIDAS)
         self.crear_meteoritos()
         self.crear_meteoritos_m()
+
+        # creación de las explosiones
+        self.explosiones = pg.sprite.Group()
+
+        # carga del sonido de la explosión
         self.exp_sound = pg.mixer.Sound(os.path.join(
             "resources", "sounds", "sonido_explosion.wav"))
+
+        # creación del contador de vidas
+        self.contador_vidas = ContadorVidas(VIDAS)
 
     def bucle_principal(self):
         salir = False
         while not salir:
             self.reloj.tick(FPS)
-            tiempo_fps = self.reloj.get_fps()
+            """
+            Parte comentada para pruebas: activa, mide los FPS por seg. para
+            ver problemas de ejecución del juego
+            """
+            #tiempo_fps = self.reloj.get_fps()
             # print(tiempo_fps)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -108,45 +123,61 @@ class PantallaJuego(Pantalla):
 
             self.pintar_fondo()
 
-            # Pintar el marcador de vidas
-            self.contador_vidas.pintar_marcador_vidas(self.pantalla)
-
             # Para mover y pintar la nave
-            self.pantalla.blit(self.player.image, self.player.rect)
-            self.player.update()
+            self.nave_jugador.draw(self.pantalla)
+            self.nave_jugador.update()
 
             # Para dibujar y actualizar el grupo de meteoritos
             self.meteoritos.draw(self.pantalla)
             self.meteoritos.update()
 
+            # Para dibujar y actualizar las explosiones
             self.explosiones.draw(self.pantalla)
             self.explosiones.update()
 
-            # Colisión de la nave con meteorito y aparece explosion (efecto y sonido)
-            colision = pg.sprite.spritecollide(
-                self.player, self.meteoritos, True)
+            # Pintar el marcador de vidas
+            self.contador_vidas.pintar_marcador_vidas(self.pantalla)
+
+            # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
+            # desaparece la nave (1ª version que funciona - mejorable?)
+            colision = pg.sprite.groupcollide(
+                self.meteoritos, self.nave_jugador, True, True)
+
             if colision:
                 self.contador_vidas.perder_vida()
-                #self.player.ha_colisionado(self.meteorito, self.meteorito_m)
-                self.explosion = Explosion(self.player.rect.center)
+                self.nave_jugador.remove(self.jugador)
+                self.explosion = Explosion(self.jugador.rect.center)
                 self.exp_sound.play()
                 self.explosiones.add(self.explosion)
+
+                # La nave vuelve a instanciarse en esta línea. Pensar en un delay del tiempo
+                # para que la nave tenga tiempo para reaccionar tras perder una vida (EN PROCESO)
+                self.crear_jugador()
 
             # Para sacar meteoritos del grupo una vez llegan al final de la pantalla y vuelve a crearlos
             self.regenerar_meteoritos()
             self.regenerar_meteoritos_m()
 
-            # Recarga de todos los elementos que funcionan en el juego
+            # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
 
+            # Estas lineas quedan comentadas para hacer pruebas. Lo que hace es
+            # cerrar el juego si se pierden todas las vidas(3).
+            """
             if self.contador_vidas.vidas == 0:
                 salir = True
+            """
 
     def pintar_fondo(self):
         "Este método pinta el fondo de estrellas de la pantalla del juego"
         self.fondo = pg.image.load(os.path.join(
             "resources", "images", "fondo_nivel.jpeg")).convert()
         self.pantalla.blit(self.fondo, (0, 0))
+
+    def crear_jugador(self):
+        "Este método instancia el objeto nave y lo añade al grupo nave_jugador"
+        self.jugador = Nave()
+        self.nave_jugador.add(self.jugador)
 
     def crear_meteoritos(self):
         """"Este método genera los meteoritos grandes al inicio de la partida y
@@ -156,6 +187,14 @@ class PantallaJuego(Pantalla):
             self.meteorito = Meteorito()
             self.meteoritos.add(self.meteorito)
 
+    def regenerar_meteoritos(self):
+        """"El método saca el meteorito grande del grupo de sprites y regenera
+        de nuevo los meteoritos si ya no quedan en el grupo"""""
+        if self.meteorito.rect.right < 0:
+            self.meteoritos.remove(self.meteorito)
+        if not self.meteorito.alive():
+            self.crear_meteoritos()
+
     def crear_meteoritos_m(self):
         """"Este método genera los meteoritos medianos al inicio de la partida y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
@@ -164,17 +203,9 @@ class PantallaJuego(Pantalla):
             self.meteorito_m = MeteoritoMediano()
             self.meteoritos.add(self.meteorito_m)
 
-    def regenerar_meteoritos(self):
-        """"El método saca el meteorito grande del grupo de sprites y regenera
-        de nuevo los meteoritos si ya no quedan en el grupo (a mejorar)"""""
-        if self.meteorito.rect.right < 0:
-            self.meteoritos.remove(self.meteorito)
-        if not self.meteorito.alive():
-            self.crear_meteoritos()
-
     def regenerar_meteoritos_m(self):
         """"El método saca el meteorito mediano del grupo de sprites y regenera
-        de nuevo los meteoritos si ya no quedan en el grupo (a mejorar)"""""
+        de nuevo los meteoritos si ya no quedan en el grupo"""""
         if self.meteorito_m.rect.right < 0:
             self.meteoritos.remove(self.meteorito_m)
         if not self.meteorito_m.alive():
