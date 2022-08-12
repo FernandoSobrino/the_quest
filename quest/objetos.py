@@ -8,10 +8,8 @@ from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS
 
 
 class Nave(Sprite):
-    margen_lateral = 20
+    margen_lateral = 30
     velocidad = 5
-    #perder_vida = False
-    #colision = False
 
     def __init__(self):
         super().__init__()
@@ -20,12 +18,6 @@ class Nave(Sprite):
         self.rect = self.image.get_rect()
         self.rect.centery = ALTO_P/2
         self.rect.x = self.margen_lateral
-
-    def ha_colisionado(self, otro, otro2):
-        if self.rect.colliderect(otro):
-            self.colision = True
-        if self.rect.colliderect(otro2):
-            self.colision = True
 
     def update(self):
         "Estos son los controles que permiten mover la nave"
@@ -38,8 +30,6 @@ class Nave(Sprite):
             self.rect.y += self.velocidad
             if self.rect.bottom > ALTO_P:
                 self.rect.bottom = ALTO_P
-        if self.ha_colisionado:
-            self.perder_vida = True
 
 
 class Meteorito(Sprite):
@@ -67,7 +57,7 @@ class Meteorito(Sprite):
             "resources", "images", "asteroids.png"))
 
         """Esta parte del código recorre el sprite sheet y almacena cada
-        fotograma en una variable en forma de lista para preparar la animación"""
+        fotograma en una lista para preparar la animación"""
         for fila in range(4):
             y = fila * self.h
             for columna in range(8):
@@ -96,11 +86,11 @@ class Meteorito(Sprite):
         self.velocidad_x = random.randrange(3, 5)
         self.rect.x -= self.velocidad_x
 
-        # controla que el meteorito no se salga por abajo(un margen) y por arriba
+        # controla que el meteorito no se salga por abajo y por arriba
         if self.rect.bottom == ALTO_P:
             self.rect.y = ALTO_P
         if self.rect.top == 0:
-            self.rect.y = 0
+            self.rect.y = 0 + 100
 
 
 class MeteoritoMediano(Sprite):
@@ -157,7 +147,6 @@ class MeteoritoMediano(Sprite):
             self.rect.top += 150
 
 
-
 class MeteoritoPequenio(Meteorito):
     "Clase a construir o eliminar (NO ACTIVA)"
 
@@ -204,11 +193,11 @@ class MeteoritoPequenio(Meteorito):
             self.rect.y = ALTO_P - 100
         if self.rect.top == 0:
             self.rect.top = 0
-# clase a construir o a eliminar
+# clase a construir o a eliminar (NO ACTIVA)
 
 
 class Explosion(Sprite):
-    "Clase a construir (ACTIVA PERO MEJORABLE)"
+    "Clase ACTIVA PERO MEJORABLE"
 
     def __init__(self, centro):
         super().__init__()
@@ -243,18 +232,20 @@ class Explosion(Sprite):
 
     def update(self):
         """Aquí se ha usado un modo distinto para animar, para probar un nuevo
-        sistema de funcionamiento. Nos basamos en los ticks del juego"""
+        sistema de funcionamiento. Nos basamos en los ticks del juego y en el método kill
+        para reiniciar la secuencia de imágenes de la explosión"""
         ahora = pg.time.get_ticks()
         if ahora - self.act_tiempo > self.tiempo_animacion:
             self.contador += 1
             self.act_tiempo = ahora
+
             if self.contador == len(self.imagenes):
                 self.kill()
-            
+
             else:
                 self.image = self.imagenes[self.contador]
-                
-            
+
+
 class ContadorVidas:
     def __init__(self, vidas_iniciales):
         self.vidas = vidas_iniciales
@@ -266,9 +257,10 @@ class ContadorVidas:
         self.vidas -= 1
         return self.vidas < 1
 
-    def pintar_marcador_vidas(self,pantalla):
+    def pintar_marcador_vidas(self, pantalla):
         texto_marcador_vidas = f"Vidas: {self.vidas}"
-        texto = self.tipografia.render(str(texto_marcador_vidas),True,COLOR_TEXTO2)
+        texto = self.tipografia.render(
+            str(texto_marcador_vidas), True, COLOR_TEXTO2)
         pos_x = texto.get_width()
         pos_y = texto.get_height() + 20
-        pg.surface.Surface.blit(pantalla,texto,(pos_x-60,pos_y))
+        pg.surface.Surface.blit(pantalla, texto, (pos_x-60, pos_y))
