@@ -140,19 +140,15 @@ class PantallaJuego(Pantalla):
 
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave (1ª version que funciona - mejorable?)
-            colision = pg.sprite.groupcollide(
-                self.meteoritos, self.nave_jugador, True, True)
+            colision = pg.sprite.spritecollide(
+                self.jugador, self.meteoritos, True)
 
             if colision:
-                self.contador_vidas.perder_vida()
-                self.nave_jugador.remove(self.jugador)
                 self.explosion = Explosion(self.jugador.rect.center)
-                self.exp_sound.play()
                 self.explosiones.add(self.explosion)
-
-                # La nave vuelve a instanciarse en esta línea. Pensar en un delay del tiempo
-                # para que la nave tenga tiempo para reaccionar tras perder una vida (EN PROCESO)
-                self.crear_jugador()
+                self.jugador.esconder_nave()
+                self.exp_sound.play()
+                self.contador_vidas.perder_vida()
 
             # Para sacar meteoritos del grupo una vez llegan al final de la pantalla y vuelve a crearlos
             self.regenerar_meteoritos()

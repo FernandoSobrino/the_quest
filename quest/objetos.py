@@ -18,8 +18,17 @@ class Nave(Sprite):
         self.rect = self.image.get_rect()
         self.rect.centery = ALTO_P/2
         self.rect.x = self.margen_lateral
+        self.nave_escondida = False
 
-    def update(self):
+    def esconder_nave(self):
+        """Este método permite posicionar la nave en un punto lejano de la pantalla tras morir
+        para simular un refresco (1ª versión)"""
+        self.tiempo_renacer = pg.time.get_ticks()/1000
+        self.nave_escondida = True
+        self.rect.centery = -1000
+        self.rect.x = -1000
+
+    def mover_nave(self):
         "Estos son los controles que permiten mover la nave"
         tecla_mov = pg.key.get_pressed()
         if tecla_mov[pg.K_UP]:
@@ -30,6 +39,18 @@ class Nave(Sprite):
             self.rect.y += self.velocidad
             if self.rect.bottom > ALTO_P:
                 self.rect.bottom = ALTO_P
+
+    def update(self):
+        """El método incluye el movimiento de la nave + la aparición de la nave
+           en su punto original tras perder una vida"""
+        self.mover_nave()
+
+        # Esta parte del código permite devolver la nave a su punto original pasado un tiempo
+        # tras perder una vida
+        if self.nave_escondida and pg.time.get_ticks()/1000 - self.tiempo_renacer > 1.5:
+            self.nave_escondida = False
+            self.rect.centery = ALTO_P/2
+            self.rect.x = self.margen_lateral
 
 
 class Meteorito(Sprite):
