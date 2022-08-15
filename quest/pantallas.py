@@ -157,6 +157,8 @@ class PantallaJuego(Pantalla):
                 self.exp_sound.play()
                 self.contador_vidas.perder_vida()
 
+
+            #Para contar puntos por cada meteorito que se esquiva (no va bien)
             for meteorito in self.meteoritos.sprites():
                 if self.meteorito.rect.right < 0:
                     self.marcador.aumentar(meteorito.puntos)
