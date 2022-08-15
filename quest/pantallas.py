@@ -89,8 +89,8 @@ class PantallaJuego(Pantalla):
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
         # creación de la nave
-        self.nave_jugador = pg.sprite.Group()
-        self.crear_jugador()
+        self.jugador = Nave()
+        
 
         # creación de los meteoritos
         self.meteoritos = pg.sprite.Group()
@@ -124,8 +124,8 @@ class PantallaJuego(Pantalla):
             self.pintar_fondo()
 
             # Para mover y pintar la nave
-            self.nave_jugador.draw(self.pantalla)
-            self.nave_jugador.update()
+            self.pantalla.blit(self.jugador.image,self.jugador.rect)
+            self.jugador.update()
 
             # Para dibujar y actualizar el grupo de meteoritos
             self.meteoritos.draw(self.pantalla)
