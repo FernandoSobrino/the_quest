@@ -170,11 +170,7 @@ class PantallaJuego(Pantalla):
             "resources", "images", "fondo_nivel.jpeg")).convert()
         self.pantalla.blit(self.fondo, (0, 0))
 
-    def crear_jugador(self):
-        "Este método instancia el objeto nave y lo añade al grupo nave_jugador"
-        self.jugador = Nave()
-        self.nave_jugador.add(self.jugador)
-
+    
     def crear_meteoritos(self):
         """"Este método genera los meteoritos grandes al inicio de la partida y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
