@@ -4,11 +4,10 @@ import random
 import pygame as pg
 from pygame.sprite import Sprite
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS, MARGEN_LATERAL, PUNTOS_PARTIDA
 
 
 class Nave(Sprite):
-    margen_lateral = 30
     velocidad = 5
 
     def __init__(self):
@@ -17,7 +16,7 @@ class Nave(Sprite):
             "resources", "images", "spaceship.png"))
         self.rect = self.image.get_rect()
         self.rect.centery = ALTO_P/2
-        self.rect.x = self.margen_lateral
+        self.rect.x = MARGEN_LATERAL
         self.nave_escondida = False
 
     def esconder_nave(self):
@@ -50,12 +49,14 @@ class Nave(Sprite):
         if self.nave_escondida and pg.time.get_ticks()/1000 - self.tiempo_renacer > 1.5:
             self.nave_escondida = False
             self.rect.centery = ALTO_P/2
-            self.rect.x = self.margen_lateral
+            self.rect.x = MARGEN_LATERAL
 
 
 class Meteorito(Sprite):
-    def __init__(self):
+    puntuacion = PUNTOS_PARTIDA
+    def __init__(self, puntuacion):
         super().__init__()
+        self.puntos = puntuacion
         self.w = 128
         self.h = 128
         self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
@@ -114,9 +115,15 @@ class Meteorito(Sprite):
             self.rect.y = 0 + 100
 
 
+        #if self.rect.right < MARGEN_LATERAL:
+            #print("Has sumado un punto")
+
+
 class MeteoritoMediano(Sprite):
-    def __init__(self):
+    puntuacion = PUNTOS_PARTIDA
+    def __init__(self,puntuacion):
         super().__init__()
+        self.puntos = puntuacion
         self.w = 96
         self.h = 96
         self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
@@ -166,6 +173,8 @@ class MeteoritoMediano(Sprite):
             self.rect.y = ALTO_P
         if self.rect.top == 0:
             self.rect.top += 150
+
+        
 
 
 class MeteoritoPequenio(Meteorito):
@@ -285,3 +294,19 @@ class ContadorVidas:
         pos_x = texto.get_width()
         pos_y = texto.get_height() + 20
         pg.surface.Surface.blit(pantalla, texto, (pos_x-60, pos_y))
+
+class Marcador:
+    def __init__(self):
+        self.valor = 0
+        font_file = os.path.join("resources", "fonts", "sans_serif_plus_7.ttf")
+        self.tipografia = pg.font.Font(font_file, 20)
+
+    def aumentar(self,puntos):
+        self.valor += puntos
+
+    def pintar_marcador(self, pantalla):
+        texto_marcador = f"Puntos: {self.valor}"
+        texto = self.tipografia.render(str(texto_marcador), True, COLOR_TEXTO2)
+        pos_x = 20
+        pos_y = ALTO_P-texto.get_height()-10
+        pg.surface.Surface.blit(pantalla, texto, (MARGEN_LATERAL,pos_y))
