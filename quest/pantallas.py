@@ -91,13 +91,11 @@ class PantallaJuego(Pantalla):
         # creación de la nave
         self.jugador = Nave()
 
-        self.marcador = Marcador()
         # creación de los meteoritos
         self.meteoritos = pg.sprite.Group()
         self.crear_meteoritos()
-
-        self.meteoritos_m = pg.sprite.Group()
         self.crear_meteoritos_m()
+        
         # creación de las explosiones
         self.explosiones = pg.sprite.Group()
 
@@ -108,9 +106,11 @@ class PantallaJuego(Pantalla):
         # creación del contador de vidas
         self.contador_vidas = ContadorVidas(VIDAS)
 
+        #creación del marcador de puntos
+        self.marcador = Marcador()
+
     def bucle_principal(self):
         salir = False
-        puntos = 0
         while not salir:
             self.reloj.tick(FPS)
             """
@@ -135,9 +135,7 @@ class PantallaJuego(Pantalla):
             self.meteoritos.draw(self.pantalla)
             self.meteoritos.update()
 
-            self.meteoritos_m.draw(self.pantalla)
-            self.meteoritos_m.update()
-
+        
             # Para dibujar y actualizar las explosiones
             self.explosiones.draw(self.pantalla)
             self.explosiones.update()
@@ -157,15 +155,18 @@ class PantallaJuego(Pantalla):
                 self.exp_sound.play()
                 self.contador_vidas.perder_vida()
 
+            # Para contar puntos por cada meteorito que se esquiva (no va bien)
+            if self.meteorito.rect.right < 0:
+                self.marcador.aumentar(self.meteorito.puntos)
+            if self.meteorito_m.rect.right < 0:
+                self.marcador.aumentar(self.meteorito_m.puntos)
+                
 
-            #Para contar puntos por cada meteorito que se esquiva (no va bien)
-            for meteorito in self.meteoritos.sprites():
-                if self.meteorito.rect.right < 0:
-                    self.marcador.aumentar(meteorito.puntos)
-
-            for meteorito in self.meteoritos_m.sprites():
+            """
+            for meteorito_m in self.meteoritos_m.sprites():
                 if self.meteorito_m.rect.right < 0:
-                    self.marcador.aumentar(meteorito.puntos)
+                    self.marcador.aumentar(meteorito_m.puntos)
+            """
 
             # Para sacar meteoritos del grupo una vez llegan al final de la pantalla y vuelve a crearlos
             self.regenerar_meteoritos()
@@ -210,15 +211,15 @@ class PantallaJuego(Pantalla):
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
         cantidad_meteoritos = random.randrange(2, 5)
         for i in range(cantidad_meteoritos):
-            puntos = i * 20
+            puntos = i * 10
             self.meteorito_m = MeteoritoMediano(puntos)
-            self.meteoritos_m.add(self.meteorito_m)
+            self.meteoritos.add(self.meteorito_m)
 
     def regenerar_meteoritos_m(self):
         """"El método saca el meteorito mediano del grupo de sprites y regenera
         de nuevo los meteoritos si ya no quedan en el grupo"""""
         if self.meteorito_m.rect.right < 0:
-            self.meteoritos_m.remove(self.meteorito_m)
+            self.meteoritos.remove(self.meteorito_m)
         if not self.meteorito_m.alive():
             #print("He pasado al jugador: 1 punto")
             self.crear_meteoritos_m()
