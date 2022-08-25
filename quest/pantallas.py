@@ -3,13 +3,14 @@ import random
 
 import pygame as pg
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, MARGEN_LATERAL, VIDAS
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, VIDAS
 
-from .objetos import ContadorVidas, Explosion, Marcador, Meteorito, MeteoritoMediano, Nave
+from .objetos import ContadorVidas, Explosion, Marcador, Meteorito, MeteoritoMediano, Nave, Planeta
 
 
 class Pantalla:
     def __init__(self, pantalla: pg.Surface):
+
         self.pantalla = pantalla
         self.reloj = pg.time.Clock()
 
@@ -20,6 +21,7 @@ class Pantalla:
 class PantallaPrincipal(Pantalla):
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
+
         font_file = os.path.join("resources", "fonts",
                                  "light_sans_serif_7.ttf")
         font_file2 = os.path.join("resources", "fonts",
@@ -88,6 +90,7 @@ class PantallaPrincipal(Pantalla):
 class PantallaJuego(Pantalla):
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
+
         # creación de la nave
         self.jugador = Nave()
 
@@ -95,22 +98,27 @@ class PantallaJuego(Pantalla):
         self.meteoritos = pg.sprite.Group()
         self.crear_meteoritos()
         self.crear_meteoritos_m()
-        
+
         # creación de las explosiones
         self.explosiones = pg.sprite.Group()
+
+        # creación del contador de vidas
+        self.contador_vidas = ContadorVidas(VIDAS)
+
+        # creación del marcador de puntos
+        self.marcador = Marcador()
+
+        # creación del planeta
+        self.planeta = Planeta()
 
         # carga del sonido de la explosión
         self.exp_sound = pg.mixer.Sound(os.path.join(
             "resources", "sounds", "sonido_explosion.wav"))
 
-        # creación del contador de vidas
-        self.contador_vidas = ContadorVidas(VIDAS)
-
-        #creación del marcador de puntos
-        self.marcador = Marcador()
-
     def bucle_principal(self):
+        "Método que controla el juego"
         salir = False
+        aterrizaje = False
         while not salir:
             self.reloj.tick(FPS)
             """
@@ -135,7 +143,9 @@ class PantallaJuego(Pantalla):
             self.meteoritos.draw(self.pantalla)
             self.meteoritos.update()
 
-        
+            # posible update del planeta (no muy seguro de si tiene que ir aquí)
+            self.planeta.update()
+
             # Para dibujar y actualizar las explosiones
             self.explosiones.draw(self.pantalla)
             self.explosiones.update()
@@ -160,17 +170,17 @@ class PantallaJuego(Pantalla):
                 self.marcador.aumentar(self.meteorito.puntos)
             if self.meteorito_m.rect.right < 0:
                 self.marcador.aumentar(self.meteorito_m.puntos)
-                
-
-            """
-            for meteorito_m in self.meteoritos_m.sprites():
-                if self.meteorito_m.rect.right < 0:
-                    self.marcador.aumentar(meteorito_m.puntos)
-            """
 
             # Para sacar meteoritos del grupo una vez llegan al final de la pantalla y vuelve a crearlos
             self.regenerar_meteoritos()
             self.regenerar_meteoritos_m()
+
+            # Primera versión de nave aterrizando y aparece planeta (en progreso)
+            if self.marcador.valor >= 100:
+                aterrizaje = True
+                self.jugador.aterrizar_nave(aterrizaje)
+                self.planeta.aparecer_planeta(ANCHO_P-self.planeta.image.get_width(
+                ), (ALTO_P-self.planeta.image.get_height())//2, self.pantalla, aterrizaje)
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
@@ -189,9 +199,9 @@ class PantallaJuego(Pantalla):
         self.pantalla.blit(self.fondo, (0, 0))
 
     def crear_meteoritos(self):
-        """"Este método genera los meteoritos grandes al inicio de la partida y
+        """"Este método genera los meteoritos grandes al inicio de la partida, les asigna puntuación y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos = random.randrange(1, 3)
+        cantidad_meteoritos = random.randrange(2, 3)
         for i in range(cantidad_meteoritos):
             puntos = i * 10
             self.meteorito = Meteorito(puntos)
@@ -203,15 +213,14 @@ class PantallaJuego(Pantalla):
         if self.meteorito.rect.right < 0:
             self.meteoritos.remove(self.meteorito)
         if not self.meteorito.alive():
-            #print("He pasado al jugador: 1 punto")
             self.crear_meteoritos()
 
     def crear_meteoritos_m(self):
-        """"Este método genera los meteoritos medianos al inicio de la partida y
-        es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos = random.randrange(2, 5)
+        """"Este método genera los meteoritos medianos al inicio de la partida, les asigna puntuación
+         y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
+        cantidad_meteoritos = random.randrange(2, 3)
         for i in range(cantidad_meteoritos):
-            puntos = i * 10
+            puntos = i * 20
             self.meteorito_m = MeteoritoMediano(puntos)
             self.meteoritos.add(self.meteorito_m)
 
@@ -221,5 +230,4 @@ class PantallaJuego(Pantalla):
         if self.meteorito_m.rect.right < 0:
             self.meteoritos.remove(self.meteorito_m)
         if not self.meteorito_m.alive():
-            #print("He pasado al jugador: 1 punto")
             self.crear_meteoritos_m()
