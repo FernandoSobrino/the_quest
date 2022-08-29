@@ -9,7 +9,7 @@ from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS, MARGEN_LATERAL, PUNTOS_PARTIDA
 
 class Nave(Sprite):
     velocidad_mover = 5
-    velocidad_aterrizar = 2
+    velocidad_aterrizar = 1
 
     def __init__(self):
         super().__init__()
@@ -26,7 +26,7 @@ class Nave(Sprite):
         para simular un refresco (1ª versión)"""
         self.tiempo_renacer = pg.time.get_ticks()/1000
         self.nave_escondida = True
-        self.rect.centery = -1000
+        self.rect.y = -1000
         self.rect.x = -1000
 
     def aterrizar_nave(self, aterrizando):
@@ -37,10 +37,11 @@ class Nave(Sprite):
                 self.rect.y -= self.velocidad_aterrizar
             else:
                 self.rect.y += self.velocidad_aterrizar
-        if self.rect.x > ANCHO_P/2:
-            self.rect.x = ANCHO_P/2
-            for angulo in range(180):
-                pg.transform.rotate(self.image, angulo)
+            if self.rect.x > ANCHO_P/2:
+                self.rect.x = ANCHO_P/2
+                for angulo in range(180):
+                    pg.transform.rotate(self.image, angulo)
+        
 
     def mover_nave(self):
         "Estos son los controles que permiten mover la nave"
@@ -66,6 +67,8 @@ class Nave(Sprite):
             self.nave_escondida = False
             self.rect.centery = ALTO_P/2
             self.rect.x = MARGEN_LATERAL
+
+        
 
 
 class Meteorito(Sprite):
@@ -203,11 +206,16 @@ class Planeta(Sprite):
             self.aparece_planeta = True
             pg.surface.Surface.blit(pantalla, self.image, (x, y))
             
-    def update(self):
-        self.rect.x -= self.velocidad_x
+            
+    def update(self,nave_aterrizando):
+        if nave_aterrizando:
+            self.rect.x -= self.velocidad_x
+            if self.rect.x < 300:
+                self.rect.x == 300
+            
         
-        if self.rect.x < 300:
-            self.rect.x == 300
+        
+        
 
 class MeteoritoPequenio(Meteorito):
     "Clase a construir o eliminar (NO ACTIVA)"
