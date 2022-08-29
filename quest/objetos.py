@@ -4,7 +4,7 @@ import random
 import pygame as pg
 from pygame.sprite import Sprite
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS, MARGEN_LATERAL, PUNTOS_PARTIDA
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS, MARGEN_LATERAL, POS_PLANETA, PUNTOS_PARTIDA
 
 
 class Nave(Sprite):
@@ -193,25 +193,24 @@ class MeteoritoMediano(Sprite):
 
 
 class Planeta(Sprite):
-    velocidad_x = 2
+    velocidad_x = 1
 
     def __init__(self):
         self.image = pg.image.load(os.path.join("resources", "images",
                                                 "planeta1.png"))
         self.rect = self.image.get_rect()
+        self.rect.x = POS_PLANETA
+        self.rect.y = (ALTO_P-self.image.get_height())//2
         self.aparece_planeta = False
 
-    def aparecer_planeta(self, x, y, pantalla, nave_aterrizando):
+    def mover_planeta(self, nave_aterrizando):
         if nave_aterrizando:
             self.aparece_planeta = True
-            pg.surface.Surface.blit(pantalla, self.image, (x, y))
-            
-            
-    def update(self,nave_aterrizando):
-        if nave_aterrizando:
             self.rect.x -= self.velocidad_x
-            if self.rect.x < 300:
-                self.rect.x == 300
+            if self.rect.x < ANCHO_P - self.rect.height:
+                self.rect.x = ANCHO_P - self.rect.height
+        
+            
             
         
         

@@ -145,6 +145,9 @@ class PantallaJuego(Pantalla):
             self.meteoritos.draw(self.pantalla)
             self.meteoritos.update()
 
+            # Para dibujar y actualizar el planeta
+            self.pantalla.blit(self.planeta.image,self.planeta.rect)
+
             # Para dibujar y actualizar las explosiones
             self.explosiones.draw(self.pantalla)
             self.explosiones.update()
@@ -181,9 +184,8 @@ class PantallaJuego(Pantalla):
             if self.marcador.valor >= 100:
                 aterrizaje = True
                 self.jugador.aterrizar_nave(aterrizaje)
-                self.planeta.aparecer_planeta(ANCHO_P-self.planeta.image.get_width(
-                ), (ALTO_P-self.planeta.image.get_height())//2, self.pantalla, aterrizaje)
-                self.planeta.update(aterrizaje)
+                self.planeta.mover_planeta(aterrizaje)
+                
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
