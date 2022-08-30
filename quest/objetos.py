@@ -18,30 +18,39 @@ class Nave(Sprite):
         self.rect = self.image.get_rect()
         self.rect.centery = ALTO_P/2
         self.rect.x = MARGEN_LATERAL
+        self.angulo = 0
         self.nave_escondida = False
         self.nave_aterrizando = False
+        #puede haber una forma mejor
+        #self.pos_nave_aterrizando = (557, 340)
 
     def esconder_nave(self):
         """Este método permite posicionar la nave en un punto lejano de la pantalla tras morir
         para simular un refresco (1ª versión)"""
         self.tiempo_renacer = pg.time.get_ticks()/1000
         self.nave_escondida = True
-        self.rect.y = -1000
         self.rect.x = -1000
 
-    def aterrizar_nave(self, aterrizando):
+    def aterrizar_nave(self, aterrizando, pantalla):
         self.nave_aterrizando = aterrizando
+
         if self.nave_aterrizando:
             self.rect.x += self.velocidad_aterrizar
             if self.rect.y > ALTO_P/2 - self.rect.height:
                 self.rect.y -= self.velocidad_aterrizar
             else:
                 self.rect.y += self.velocidad_aterrizar
+
             if self.rect.x > ANCHO_P/2:
                 self.rect.x = ANCHO_P/2
-                for angulo in range(180):
-                    pg.transform.rotate(self.image, angulo)
-        
+                #centro_original = imagen.get_rect().center
+                #imagen_rotada = imagen.transform.rotate(angulo)
+                #imagen_rotada.get_rect().center = centro_original
+                self.rect.center = self.pos_nave_aterrizando
+                self.angulo += 1 % 180
+                pantalla.blit(pg.transform.rotate(
+                    self.image, self.angulo), (self.rect))
+                #self.image = pg.transform.rotate(self.image,self.angulo)
 
     def mover_nave(self):
         "Estos son los controles que permiten mover la nave"
@@ -67,8 +76,6 @@ class Nave(Sprite):
             self.nave_escondida = False
             self.rect.centery = ALTO_P/2
             self.rect.x = MARGEN_LATERAL
-
-        
 
 
 class Meteorito(Sprite):
@@ -125,14 +132,14 @@ class Meteorito(Sprite):
             self.image = self.imagenes[self.contador]
 
         # controla la velocidad del meteorito
-        self.velocidad_x = random.randrange(3, 5)
+        self.velocidad_x = random.randint(2, 4)
         self.rect.x -= self.velocidad_x
 
         # controla que el meteorito no se salga por abajo y por arriba
         if self.rect.bottom == ALTO_P:
             self.rect.y = ALTO_P
         if self.rect.top == 0:
-            self.rect.y = 0 + 100
+            self.rect.y += 150
 
 
 class MeteoritoMediano(Sprite):
@@ -183,7 +190,7 @@ class MeteoritoMediano(Sprite):
 
             self.image = self.imagenes[self.contador]
 
-        self.velocidad_x = random.randrange(3, 7)
+        self.velocidad_x = random.randint(3, 5)
         self.rect.x -= self.velocidad_x
 
         if self.rect.bottom == ALTO_P:
@@ -209,12 +216,7 @@ class Planeta(Sprite):
             self.rect.x -= self.velocidad_x
             if self.rect.x < ANCHO_P - self.rect.height:
                 self.rect.x = ANCHO_P - self.rect.height
-        
-            
-            
-        
-        
-        
+
 
 class MeteoritoPequenio(Meteorito):
     "Clase a construir o eliminar (NO ACTIVA)"
@@ -255,7 +257,7 @@ class MeteoritoPequenio(Meteorito):
 
             self.image = self.imagenes[self.index]
 
-        self.velocidad_x = random.randrange(5, 9)
+        self.velocidad_x = random.randint(5, 9)
         self.rect.x -= self.velocidad_x
 
         if self.rect.bottom == ALTO_P:

@@ -135,6 +135,7 @@ class PantallaJuego(Pantalla):
             self.pintar_fondo()
 
             # Para mover y pintar la nave
+            #if not aterrizaje:
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
             self.jugador.update()
 
@@ -146,7 +147,7 @@ class PantallaJuego(Pantalla):
             self.meteoritos.update()
 
             # Para dibujar y actualizar el planeta
-            self.pantalla.blit(self.planeta.image,self.planeta.rect)
+            self.pantalla.blit(self.planeta.image, self.planeta.rect)
 
             # Para dibujar y actualizar las explosiones
             self.explosiones.draw(self.pantalla)
@@ -156,17 +157,18 @@ class PantallaJuego(Pantalla):
             self.contador_vidas.pintar_marcador_vidas(self.pantalla)
 
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
-            # desaparece la nave (1ª version que funciona - mejorable?)
-            colision = pg.sprite.spritecollide(
+            # desaparece la nave (1ª version que funciona)
+            
+            # if not aterrizaje: (a desarrollar)
+            self.colision = pg.sprite.spritecollide(
                 self.jugador, self.meteoritos, True)
 
-            if colision:
+            if self.colision:
                 self.explosion = Explosion(self.jugador.rect.center)
                 self.explosiones.add(self.explosion)
                 self.jugador.esconder_nave()
                 self.exp_sound.play()
                 self.contador_vidas.perder_vida()
-            
 
             # Para contar puntos por cada meteorito que se esquiva (no va bien)
             if self.meteorito.rect.right < 0:
@@ -174,18 +176,16 @@ class PantallaJuego(Pantalla):
             if self.meteorito_m.rect.right < 0:
                 self.marcador.aumentar(self.meteorito_m.puntos)
 
-
             # Para sacar meteoritos del grupo una vez llegan al final de la pantalla y vuelve a crearlos
+            # if not aterrizaje: (a desarrollar)
             self.regenerar_meteoritos(aterrizaje)
             self.regenerar_meteoritos_m(aterrizaje)
-            
-            
+
             # Primera versión de nave aterrizando y aparece planeta (en progreso)
-            if self.marcador.valor >= 100:
+            if self.marcador.valor >= 20:
                 aterrizaje = True
-                self.jugador.aterrizar_nave(aterrizaje)
+                self.jugador.aterrizar_nave(aterrizaje,self.pantalla)
                 self.planeta.mover_planeta(aterrizaje)
-                
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
@@ -206,41 +206,39 @@ class PantallaJuego(Pantalla):
     def crear_meteoritos(self):
         """"Este método genera los meteoritos grandes al inicio de la partida, les asigna puntuación y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        
-        cantidad_meteoritos = random.randrange(2, 3)
+        cantidad_meteoritos = random.randint(1, 3)
         for i in range(cantidad_meteoritos):
-            puntos = (i + 10) - i
+            puntos = i + 10
             self.meteorito = Meteorito(puntos)
             self.meteoritos.add(self.meteorito)
-        
 
-    def regenerar_meteoritos(self,viaje):
+    def regenerar_meteoritos(self, fin_viaje):
         """"El método saca el meteorito grande del grupo de sprites y regenera
         de nuevo los meteoritos si ya no quedan en el grupo"""""
-        if not viaje:   
+        if not fin_viaje:
             if self.meteorito.rect.right < 0:
                 self.meteoritos.remove(self.meteorito)
             if not self.meteorito.alive():
                 self.crear_meteoritos()
         else:
-            self.meteoritos.remove(self.meteorito)
+            self.meteorito.kill()
 
     def crear_meteoritos_m(self):
         """"Este método genera los meteoritos medianos al inicio de la partida, les asigna puntuación
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos = random.randrange(2, 3)
-        for i in range(cantidad_meteoritos):
-            puntos = (i + 20) - i
-            self.meteorito_m = MeteoritoMediano(puntos)
+        cantidad_meteoritos_m = random.randint(2, 4)
+        for i in range(cantidad_meteoritos_m):
+            puntos_m = i + 20
+            self.meteorito_m = MeteoritoMediano(puntos_m)
             self.meteoritos.add(self.meteorito_m)
 
-    def regenerar_meteoritos_m(self,viaje):
+    def regenerar_meteoritos_m(self, fin_viaje):
         """"El método saca el meteorito mediano del grupo de sprites y regenera
         de nuevo los meteoritos si ya no quedan en el grupo"""""
-        if not viaje:
+        if not fin_viaje:
             if self.meteorito_m.rect.right < 0:
                 self.meteoritos.remove(self.meteorito_m)
             if not self.meteorito_m.alive():
                 self.crear_meteoritos_m()
         else:
-            self.meteoritos.remove(self.meteorito_m)
+            self.meteorito_m.kill()
