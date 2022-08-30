@@ -157,18 +157,17 @@ class PantallaJuego(Pantalla):
             self.contador_vidas.pintar_marcador_vidas(self.pantalla)
 
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
-            # desaparece la nave (1ª version que funciona)
-            
-            # if not aterrizaje: (a desarrollar)
-            self.colision = pg.sprite.spritecollide(
+            # desaparece la nave (añadido ignorar las colisiones cuando debe aterrizar)
+            if not aterrizaje: 
+                self.colision = pg.sprite.spritecollide(
                 self.jugador, self.meteoritos, True)
 
-            if self.colision:
-                self.explosion = Explosion(self.jugador.rect.center)
-                self.explosiones.add(self.explosion)
-                self.jugador.esconder_nave()
-                self.exp_sound.play()
-                self.contador_vidas.perder_vida()
+                if self.colision:
+                    self.explosion = Explosion(self.jugador.rect.center)
+                    self.explosiones.add(self.explosion)
+                    self.jugador.esconder_nave()
+                    self.exp_sound.play()
+                    self.contador_vidas.perder_vida()
 
             # Para contar puntos por cada meteorito que se esquiva (no va bien)
             if self.meteorito.rect.right < 0:
