@@ -135,7 +135,7 @@ class PantallaJuego(Pantalla):
             self.pintar_fondo()
 
             # Para mover y pintar la nave
-            #if not aterrizaje:
+            # if not aterrizaje:
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
             self.jugador.update()
 
@@ -158,9 +158,9 @@ class PantallaJuego(Pantalla):
 
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave (añadido ignorar las colisiones cuando debe aterrizar)
-            if not aterrizaje: 
+            if not aterrizaje:
                 self.colision = pg.sprite.spritecollide(
-                self.jugador, self.meteoritos, True)
+                    self.jugador, self.meteoritos, True)
 
                 if self.colision:
                     self.explosion = Explosion(self.jugador.rect.center)
@@ -183,7 +183,7 @@ class PantallaJuego(Pantalla):
             # Primera versión de nave aterrizando y aparece planeta (en progreso)
             if self.marcador.valor >= 20:
                 aterrizaje = True
-                self.jugador.aterrizar_nave(aterrizaje,self.pantalla)
+                self.jugador.aterrizar_nave(aterrizaje, self.pantalla)
                 self.planeta.mover_planeta(aterrizaje)
 
             # Actualización de todos los elementos que se están mostrando en la partida

@@ -6,7 +6,6 @@ from .pantallas import Pantalla, PantallaPrincipal, PantallaJuego
 
 class Quest:
     def __init__(self):
-        print("Arranca el juego")
         pg.init()
         self.display = pg.display.set_mode((ANCHO_P, ALTO_P))
         pg.display.set_caption("THE QUEST")
