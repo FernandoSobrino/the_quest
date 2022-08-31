@@ -29,7 +29,7 @@ cd quest
 
 # Para crear el entorno virtual:
 
-python - m venv nombre_del_entorno
+python -m venv nombre_del_entorno
 (se recomienda env por defecto)
 
 `````
