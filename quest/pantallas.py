@@ -29,9 +29,8 @@ class PantallaPrincipal(Pantalla):
         self.tipografia = pg.font.Font(font_file, 100)
         self.tipo_juego = pg.font.Font(font_file2, 30)
         self.tipo_info = pg.font.Font(font_file2, 20)
-
+        
     def bucle_principal(self):
-        # pg.mixer.music.play()
         salir = False
         while not salir:
             for event in pg.event.get():
@@ -90,7 +89,7 @@ class PantallaPrincipal(Pantalla):
 class PantallaJuego(Pantalla):
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
-
+    
         # creación de la nave
         self.jugador = Nave()
 
@@ -114,11 +113,16 @@ class PantallaJuego(Pantalla):
         # carga del sonido de la explosión
         self.exp_sound = pg.mixer.Sound(os.path.join(
             "resources", "sounds", "sonido_explosion.wav"))
+        
+        # carga de la música del juego
+        self.musica = pg.mixer.music.load(os.path.join(
+            "resources", "sounds", "musica_juego.mp3"))
 
     def bucle_principal(self):
         "Método que controla el juego"
         salir = False
         aterrizaje = False
+        #pg.mixer.music.play(-1)
         while not salir:
             self.reloj.tick(FPS)
             """
@@ -181,7 +185,7 @@ class PantallaJuego(Pantalla):
             self.regenerar_meteoritos_m(aterrizaje)
 
             # Primera versión de nave aterrizando y aparece planeta (en progreso)
-            if self.marcador.valor >= 20:
+            if self.marcador.valor >= 5000:
                 aterrizaje = True
                 self.jugador.aterrizar_nave(aterrizaje, self.pantalla)
                 self.planeta.mover_planeta(aterrizaje)
