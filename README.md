@@ -66,4 +66,4 @@ Siga los pasos 1 y 2 anteriores tal y como se indican.
 pip install requirements-dev.txt
 ````
 
-4. Abra el repositorio como directorio en tu IDE favorito
+4. Abra el repositorio como directorio en su IDE favorito
