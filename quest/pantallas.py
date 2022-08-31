@@ -122,7 +122,7 @@ class PantallaJuego(Pantalla):
         "Método que controla el juego"
         salir = False
         aterrizaje = False
-        #pg.mixer.music.play(-1)
+        pg.mixer.music.play(-1)
         while not salir:
             self.reloj.tick(FPS)
             """
@@ -138,24 +138,27 @@ class PantallaJuego(Pantalla):
             # Para pintar el fondo del nivel
             self.pintar_fondo()
 
-            # Para mover y pintar la nave
-            # if not aterrizaje:
-            self.pantalla.blit(self.jugador.image, self.jugador.rect)
+            # Para mover y pintar la nave y mover el planeta cuando la nave aterrice
             self.jugador.update()
+            if not aterrizaje:
+                self.pantalla.blit(self.jugador.image, self.jugador.rect)
+            else:
+                self.jugador.aterrizar_nave(aterrizaje, self.pantalla)
+                self.planeta.mover_planeta(aterrizaje)
 
             # Para pintar el mardador de puntos
             self.marcador.pintar_marcador(self.pantalla)
 
             # Para dibujar y actualizar el grupo de meteoritos
-            self.meteoritos.draw(self.pantalla)
             self.meteoritos.update()
+            self.meteoritos.draw(self.pantalla)
 
             # Para dibujar y actualizar el planeta
             self.pantalla.blit(self.planeta.image, self.planeta.rect)
 
             # Para dibujar y actualizar las explosiones
-            self.explosiones.draw(self.pantalla)
             self.explosiones.update()
+            self.explosiones.draw(self.pantalla)
 
             # Pintar el marcador de vidas
             self.contador_vidas.pintar_marcador_vidas(self.pantalla)
@@ -185,10 +188,9 @@ class PantallaJuego(Pantalla):
             self.regenerar_meteoritos_m(aterrizaje)
 
             # Primera versión de nave aterrizando y aparece planeta (en progreso)
-            if self.marcador.valor >= 5000:
+            if self.marcador.valor >= 200:
                 aterrizaje = True
-                self.jugador.aterrizar_nave(aterrizaje, self.pantalla)
-                self.planeta.mover_planeta(aterrizaje)
+                
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
@@ -211,7 +213,7 @@ class PantallaJuego(Pantalla):
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
         cantidad_meteoritos = random.randint(1, 3)
         for i in range(cantidad_meteoritos):
-            puntos = i + 10
+            puntos = (i + 10) - i
             self.meteorito = Meteorito(puntos)
             self.meteoritos.add(self.meteorito)
 
@@ -225,17 +227,18 @@ class PantallaJuego(Pantalla):
                 self.crear_meteoritos()
         else:
             self.meteorito.kill()
+        
 
     def crear_meteoritos_m(self):
         """"Este método genera los meteoritos medianos al inicio de la partida, les asigna puntuación
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
         cantidad_meteoritos_m = random.randint(2, 4)
         for i in range(cantidad_meteoritos_m):
-            puntos_m = i + 20
+            puntos_m = (i + 20) - i
             self.meteorito_m = MeteoritoMediano(puntos_m)
             self.meteoritos.add(self.meteorito_m)
 
-    def regenerar_meteoritos_m(self, fin_viaje):
+    def regenerar_meteoritos_m(self,fin_viaje):
         """"El método saca el meteorito mediano del grupo de sprites y regenera
         de nuevo los meteoritos si ya no quedan en el grupo"""""
         if not fin_viaje:
