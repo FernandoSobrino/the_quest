@@ -1,10 +1,16 @@
-# The Quest
 
-Año 2045. El planeta Tierra ha sido asolado por una fuerte tormenta solar.
-Los únicos supervivientes han tomado rumbo en un transbordador espacial hacia 
-un nuevo planeta habitable en el espacio exterior. Lleva a estos supervivientes 
-esquivando los peligros del espacio y consigue liberar a la raza humana
-de la extinción inminente.
+# The Quest
+Juego realizado en lenguaje Python con la librería Pygame.
+
+
+
+# Historia de The Quest
+Año 2045. El planeta Tierra ha sido devastado por una fuerte tormenta solar.
+Los únicos supervivientes han tomado rumbo en un transbordador espacial, en búsqueda 
+de un nuevo planeta habitable. 
+
+Lleva a los supervivientes esquivando los peligros del espacio y consigue liberar a la raza humana de la extinción inminente.
+
 
 ## Para jugar
 
@@ -30,7 +36,7 @@ cd quest
 # Para crear el entorno virtual:
 
 python -m venv nombre_del_entorno
-(se recomienda env por defecto)
+(se recomienda "env" como nombre_del_entorno por defecto)
 
 # Para activar el entorno virtual:
 
@@ -66,4 +72,7 @@ Sigue los pasos 1 y 2 anteriores tal y como se indican.
 pip install requirements-dev.txt
 ````
 
-4. Abre el repositorio como directorio en tu IDE favorito
+4. Abre los archivos en tu IDE favorito
+
+
+Proyecto de fin de Bootcamp Zero de la escuela Keepcoding (2022)
