@@ -21,8 +21,8 @@ git clone https:// (lo que sigue)
 
 2. Crear un entorno virtual dentro de la raíz del repositorio
 
-    Asegúrese de que se encuentra en el directorio raíz. Para ello,
-    ejecute en su consola:
+    Asegúrate de que te encuentras en el directorio raíz. Para ello,
+    ejecuta en tu consola:
 
 `````
 cd quest
@@ -52,13 +52,13 @@ pip install -r requirements.txt
 4. Arrancar el juego
 
 ````
-#ejecute el módulo principal para jugar:
+#ejecuta el módulo principal para jugar:
 python main.py
 ````
 
 ## Para colaborar en el proyecto
 
-Siga los pasos 1 y 2 anteriores tal y como se indican.
+Sigue los pasos 1 y 2 anteriores tal y como se indican.
 
 3. Instalar las dependencias
 
@@ -66,4 +66,4 @@ Siga los pasos 1 y 2 anteriores tal y como se indican.
 pip install requirements-dev.txt
 ````
 
-4. Abra el repositorio como directorio en su IDE favorito
+4. Abre el repositorio como directorio en tu IDE favorito
