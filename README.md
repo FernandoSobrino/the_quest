@@ -32,6 +32,14 @@ cd quest
 python -m venv nombre_del_entorno
 (se recomienda env por defecto)
 
+# Para activar el entorno virtual:
+
+# en Windows:
+.\env\Scripts\activate
+
+# en Mac, Linux:
+source ./env/bin/activate
+
 `````
 
 3. Instalar las dependencias
@@ -43,15 +51,7 @@ pip install -r requirements.txt
 
 4. Arrancar el juego
 
-    Por último, ejecute la activación del entorno virtual:
-
 ````
-# en Windows:
-.\env\Scripts\activate
-
-# en Mac, Linux:
-source ./env/bin/activate
-
 #ejecute el módulo principal para jugar:
 python main.py
 ````
