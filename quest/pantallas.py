@@ -29,7 +29,7 @@ class PantallaPrincipal(Pantalla):
         self.tipografia = pg.font.Font(font_file, 100)
         self.tipo_juego = pg.font.Font(font_file2, 30)
         self.tipo_info = pg.font.Font(font_file2, 20)
-        
+
     def bucle_principal(self):
         salir = False
         while not salir:
@@ -89,7 +89,7 @@ class PantallaPrincipal(Pantalla):
 class PantallaJuego(Pantalla):
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
-    
+
         # creación de la nave
         self.jugador = Nave()
 
@@ -97,6 +97,9 @@ class PantallaJuego(Pantalla):
         self.meteoritos = pg.sprite.Group()
         self.crear_meteoritos()
         self.crear_meteoritos_m()
+
+        # creación del planeta
+        self.planeta = Planeta()
 
         # creación de las explosiones
         self.explosiones = pg.sprite.Group()
@@ -107,22 +110,24 @@ class PantallaJuego(Pantalla):
         # creación del marcador de puntos
         self.marcador = Marcador()
 
-        # creación del planeta
-        self.planeta = Planeta()
-
         # carga del sonido de la explosión
         self.exp_sound = pg.mixer.Sound(os.path.join(
             "resources", "sounds", "sonido_explosion.wav"))
-        
+
         # carga de la música del juego
         self.musica = pg.mixer.music.load(os.path.join(
             "resources", "sounds", "musica_juego.mp3"))
 
     def bucle_principal(self):
         "Método que controla el juego"
+
+        # Flags de salida del juego y de fase de aterrizaje
         salir = False
         aterrizaje = False
+
+        # Reproducción de la música del juego (en bucle)
         pg.mixer.music.play(-1)
+
         while not salir:
             self.reloj.tick(FPS)
             """
@@ -131,6 +136,8 @@ class PantallaJuego(Pantalla):
             """
             #tiempo_fps = self.reloj.get_fps()
             # print(tiempo_fps)
+
+            # Condición para cerrar el juego si pulsamos la X de la ventana
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     salir = True
@@ -146,25 +153,25 @@ class PantallaJuego(Pantalla):
                 self.jugador.aterrizar_nave(aterrizaje, self.pantalla)
                 self.planeta.mover_planeta(aterrizaje)
 
-            # Para pintar el mardador de puntos
+            # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
 
             # Para dibujar y actualizar el grupo de meteoritos
             self.meteoritos.update()
             self.meteoritos.draw(self.pantalla)
 
-            # Para dibujar y actualizar el planeta
+            # Para dibujar el planeta
             self.pantalla.blit(self.planeta.image, self.planeta.rect)
 
             # Para dibujar y actualizar las explosiones
             self.explosiones.update()
             self.explosiones.draw(self.pantalla)
 
-            # Pintar el marcador de vidas
+            # Para pintar el marcador de vidas
             self.contador_vidas.pintar_marcador_vidas(self.pantalla)
 
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
-            # desaparece la nave (añadido ignorar las colisiones cuando debe aterrizar)
+            # desaparece la nave. También desactiva colisiones durante el aterrizaje
             if not aterrizaje:
                 self.colision = pg.sprite.spritecollide(
                     self.jugador, self.meteoritos, True)
@@ -176,7 +183,7 @@ class PantallaJuego(Pantalla):
                     self.exp_sound.play()
                     self.contador_vidas.perder_vida()
 
-            # Para contar puntos por cada meteorito que se esquiva (no va bien)
+            # Para contar puntos por cada meteorito que se esquiva (no va bien - mejorable)
             if self.meteorito.rect.right < 0:
                 self.marcador.aumentar(self.meteorito.puntos)
             if self.meteorito_m.rect.right < 0:
@@ -187,20 +194,18 @@ class PantallaJuego(Pantalla):
             self.regenerar_meteoritos(aterrizaje)
             self.regenerar_meteoritos_m(aterrizaje)
 
-            # Primera versión de nave aterrizando y aparece planeta (en progreso)
+            # Condición que activa el flag de aterrizaje
             if self.marcador.valor >= 200:
                 aterrizaje = True
-                
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
 
-            # Estas lineas quedan comentadas para hacer pruebas. Lo que hace es
-            # cerrar el juego si se pierden todas las vidas(3).
-            """
+            # Estas líneas de código sirven para cerrar el juego si se pierden todas las vidas
             if self.contador_vidas.vidas == 0:
                 salir = True
-            """
+
+    # -------------MÉTODOS DE FUNCIONAMIENTO INDEPENDIENTES DE LAS CLASES-----------#
 
     def pintar_fondo(self):
         "Este método pinta el fondo de estrellas de la pantalla del juego"
@@ -227,7 +232,6 @@ class PantallaJuego(Pantalla):
                 self.crear_meteoritos()
         else:
             self.meteorito.kill()
-        
 
     def crear_meteoritos_m(self):
         """"Este método genera los meteoritos medianos al inicio de la partida, les asigna puntuación
@@ -238,7 +242,7 @@ class PantallaJuego(Pantalla):
             self.meteorito_m = MeteoritoMediano(puntos_m)
             self.meteoritos.add(self.meteorito_m)
 
-    def regenerar_meteoritos_m(self,fin_viaje):
+    def regenerar_meteoritos_m(self, fin_viaje):
         """"El método saca el meteorito mediano del grupo de sprites y regenera
         de nuevo los meteoritos si ya no quedan en el grupo"""""
         if not fin_viaje:
