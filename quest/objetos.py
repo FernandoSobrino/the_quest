@@ -169,7 +169,7 @@ class Planeta(Sprite):
                                                 "planeta1.png"))
         self.rect = self.image.get_rect()
         self.rect.x = POS_PLANETA
-        self.rect.y = (ALTO_P-self.image.get_height())//2
+        self.rect.y = (ALTO_P-self.image.get_height())/2
         self.aparece_planeta = False
 
     def mover_planeta(self, nave_aterrizando):
@@ -180,56 +180,8 @@ class Planeta(Sprite):
                 self.rect.x = ANCHO_P - self.rect.height
 
 
-class MeteoritoPequenio(Meteorito):
-    "Clase a construir o eliminar (NO ACTIVA)"
-
-    def __init__(self):
-        super().__init__()
-        self.w = 41.5
-        self.h = 50
-
-        # Cambio del tiempo de animación según la clase padre Meteorito
-        self.animation_time = FPS // 2
-        self.loadFrames()
-
-    def loadFrames(self):
-
-        sprite_sheet = pg.image.load(os.path.join(
-            "resources", "images", "asteroids_usmall.png"))
-
-        for fila in range(5):
-            y = fila * self.h
-            for columna in range(6):
-                x = columna * self.w
-                image = pg.Surface((self.w, self.h), pg.SRCALPHA)
-                image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
-                self.imagenes.append(image)
-
-        self.how_many = len(self.imagenes)
-        self.image = self.imagenes[self.index]
-
-    def update(self):
-        self.current_time += self.animation_time
-        if self.current_time > FPS:
-            self.current_time = 0
-            self.index += 1
-
-            if self.index >= self.how_many:
-                self.index = 0
-
-            self.image = self.imagenes[self.index]
-
-        self.velocidad_x = random.randint(5, 9)
-        self.rect.x -= self.velocidad_x
-
-        if self.rect.bottom == ALTO_P:
-            self.rect.y = ALTO_P - 100
-        if self.rect.top == 0:
-            self.rect.top = 0
-
-
 class Explosion(Sprite):
-    "Clase ACTIVA PERO MEJORABLE"
+    "Clase que pinta las explosiones de la nave cuando choca con los meteoritos"
 
     def __init__(self, centro):
         super().__init__()
@@ -239,7 +191,7 @@ class Explosion(Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = centro
 
-        # Almacenar los frames
+        # Almacena las imágenes del sprite sheet y se establecen los atributos de animación
         self.imagenes = []
         self.contador = 0
         self.tiempo_animacion = FPS // 2
@@ -313,3 +265,51 @@ class Marcador:
         pos_x = texto.get_width() - 72
         pos_y = ALTO_P - texto.get_height() - 30
         pg.surface.Surface.blit(pantalla, texto, (pos_x, pos_y))
+
+
+class MeteoritoPequenio(Meteorito):
+    "Clase a construir o eliminar (NO ACTIVA)"
+
+    def __init__(self):
+        super().__init__()
+        self.w = 41.5
+        self.h = 50
+
+        # Cambio del tiempo de animación según la clase padre Meteorito
+        self.animation_time = FPS // 2
+        self.loadFrames()
+
+    def loadFrames(self):
+
+        sprite_sheet = pg.image.load(os.path.join(
+            "resources", "images", "asteroids_usmall.png"))
+
+        for fila in range(5):
+            y = fila * self.h
+            for columna in range(6):
+                x = columna * self.w
+                image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+                image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
+                self.imagenes.append(image)
+
+        self.how_many = len(self.imagenes)
+        self.image = self.imagenes[self.index]
+
+    def update(self):
+        self.current_time += self.animation_time
+        if self.current_time > FPS:
+            self.current_time = 0
+            self.index += 1
+
+            if self.index >= self.how_many:
+                self.index = 0
+
+            self.image = self.imagenes[self.index]
+
+        self.velocidad_x = random.randint(5, 9)
+        self.rect.x -= self.velocidad_x
+
+        if self.rect.bottom == ALTO_P:
+            self.rect.y = ALTO_P - 100
+        if self.rect.top == 0:
+            self.rect.top = 0
