@@ -21,7 +21,6 @@ class Nave(Sprite):
         self.angulo = 0
         self.nave_escondida = False
         self.nave_aterrizando = False
-        
 
     def esconder_nave(self):
         """Este método permite posicionar la nave en un punto lejano de la pantalla tras morir
@@ -42,10 +41,10 @@ class Nave(Sprite):
 
             if self.rect.x > ANCHO_P/2 + 30:
                 self.rect.x = ANCHO_P/2 + 30
-                
+
                 self.angulo += 1
-                #self.centro_original = self.image.get_rect(
-                    #topleft=(self.rect.x,self.rect.y)).center
+                # self.centro_original = self.image.get_rect(
+                # topleft=(self.rect.x,self.rect.y)).center
                 img_rotada = pg.transform.rotate(self.image, self.angulo)
                 #rect_rotado = img_rotada.get_rect(center=self.centro_original)
                 rect_rotado = img_rotada.get_rect(center=self.rect.center)
@@ -53,7 +52,6 @@ class Nave(Sprite):
             else:
                 pantalla.blit(self.image, self.rect)
 
-            
             if self.angulo > 180:
                 self.angulo = 180
 
@@ -85,6 +83,7 @@ class Nave(Sprite):
 
 
 class Meteorito(Sprite):
+    """Superclase Meteorito"""
     puntuacion = PUNTOS_PARTIDA
 
     def __init__(self, puntuacion):
@@ -93,25 +92,21 @@ class Meteorito(Sprite):
         self.w = 128
         self.h = 128
         self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+        self.plantilla_imagenes = pg.image.load(os.path.join(
+            "resources", "images", "asteroids.png"))
         self.rect = self.image.get_rect()
         self.rect.x = ANCHO_P - self.rect.width
         self.rect.y = random.randrange(ALTO_P-self.rect.height)
-        self.velocidad_x = random.randint(2,8)
-        
-        # Almacenar los frames
+        self.velocidad_x = random.randint(3, 8)
+
+        # Código para almacenar los frames del sprite sheet en una lista
         self.imagenes = []
         self.contador = 0
         self.tiempo_animacion = FPS // 4
         self.momento_actual = 0
-        self.cargarFrames()
+        self.cargarFrames(self.plantilla_imagenes)
 
-    def cargarFrames(self):
-        """Este método sirve para cargar las imágenes que harán el efecto de que
-        el meteorito gire sobre sí mismo al desplazarse"""
-
-        sprite_sheet = pg.image.load(os.path.join(
-            "resources", "images", "asteroids.png"))
-
+    def cargarFrames(self, sprite_sheet):
         """Esta parte del código recorre el sprite sheet y almacena cada
         fotograma en una lista para preparar la animación"""
         for fila in range(4):
@@ -122,8 +117,8 @@ class Meteorito(Sprite):
                 image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
                 self.imagenes.append(image)
 
-                self.siguiente_imagen = 0
-                self.siguiente_imagen = len(self.imagenes)
+                self.imagenes_cargadas = 0
+                self.imagenes_cargadas = len(self.imagenes)
                 self.image = self.imagenes[self.contador]
 
     def update(self):
@@ -133,13 +128,12 @@ class Meteorito(Sprite):
             self.momento_actual = 0
             self.contador += 1
 
-            if self.contador >= self.siguiente_imagen:
+            if self.contador >= self.imagenes_cargadas:
                 self.contador = 0
 
             self.image = self.imagenes[self.contador]
 
         # controla la velocidad del meteorito
-        
         self.rect.x -= self.velocidad_x
 
         # controla que el meteorito no se salga por abajo y por arriba
@@ -149,62 +143,22 @@ class Meteorito(Sprite):
             self.rect.y += 150
 
 
-class MeteoritoMediano(Sprite):
-    puntuacion = PUNTOS_PARTIDA
+class MeteoritoMediano(Meteorito):
+    """Subclase. Sólo conserva aquellos atributos que difieren de la superclase
+    Meteorito"""""
 
     def __init__(self, puntuacion):
-        super().__init__()
-        self.puntos = puntuacion
+        super().__init__(puntuacion)
         self.w = 96
         self.h = 96
-        self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
-        self.rect = self.image.get_rect()
-        self.rect.x = ANCHO_P - self.rect.width
-        self.rect.y = random.randrange(ALTO_P-self.rect.height)
-        self.velocidad_x = random.randint(3, 10)
-
-        # Almacenar los frames
-        self.imagenes = []
-        self.contador = 0
-        self.tiempo_animacion = FPS // 3
-        self.momento_actual = 0
-        self.cargarFrames()
-
-    def cargarFrames(self):
-
-        sprite_sheet = pg.image.load(os.path.join(
+        self.velocidad_x = random.randint(4, 10)
+        self.plantilla_imagenes = pg.image.load(os.path.join(
             "resources", "images", "asteroids_medium.png"))
 
-        for fila in range(5, 8):
-            y = fila * self.h
-            for columna in range(8):
-                x = columna * self.w
-                image = pg.Surface((self.w, self.h), pg.SRCALPHA)
-                image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
-                self.imagenes.append(image)
-
-        self.imagenes_cargadas = 0
-        self.imagenes_cargadas = len(self.imagenes)
-        self.image = self.imagenes[self.contador]
-
-    def update(self):
-        self.momento_actual += self.tiempo_animacion
-        if self.momento_actual > FPS:
-            self.momento_actual = 0
-            self.contador += 1
-
-            if self.contador >= self.imagenes_cargadas:
-                self.contador = 0
-
-            self.image = self.imagenes[self.contador]
-
-        
-        self.rect.x -= self.velocidad_x
-
-        if self.rect.bottom == ALTO_P:
-            self.rect.y = ALTO_P
-        if self.rect.top == 0:
-            self.rect.top += 150
+        # Para almacenar los frames del sprite sheet del meteorito mediano
+        self.imagenes = []
+        self.tiempo_animacion = FPS // 3
+        self.cargarFrames(self.plantilla_imagenes)
 
 
 class Planeta(Sprite):
@@ -356,6 +310,6 @@ class Marcador:
     def pintar_marcador(self, pantalla):
         texto_marcador = f"Puntos: {self.valor}"
         texto = self.tipografia.render(str(texto_marcador), True, COLOR_TEXTO2)
-        pos_x = texto.get_width() - 60
+        pos_x = texto.get_width() - 72
         pos_y = ALTO_P - texto.get_height() - 30
         pg.surface.Surface.blit(pantalla, texto, (pos_x, pos_y))
