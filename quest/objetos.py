@@ -21,6 +21,8 @@ class Nave(Sprite):
         self.angulo = 0
         self.nave_escondida = False
         self.nave_aterrizando = False
+        self.rotacion = False
+        self.fin_rotacion = False
 
     def esconder_nave(self):
         """Este método permite posicionar la nave en un punto lejano de la pantalla tras morir
@@ -32,7 +34,7 @@ class Nave(Sprite):
     def aterrizar_nave(self, aterrizando, pantalla):
         """Este método hace las maniobras de aterrizaje de la nave"""
         self.nave_aterrizando = aterrizando
-        if self.nave_aterrizando:
+        if aterrizando:
             self.rect.x += self.velocidad_aterrizar
             if self.rect.y > (ALTO_P - self.rect.height)/2:
                 self.rect.y -= self.velocidad_aterrizar
@@ -41,19 +43,26 @@ class Nave(Sprite):
 
             if self.rect.x > ANCHO_P/2 + 30:
                 self.rect.x = ANCHO_P/2 + 30
+                self.rotacion = True
 
-                self.angulo += 1
                 # self.centro_original = self.image.get_rect(
                 # topleft=(self.rect.x,self.rect.y)).center
-                img_rotada = pg.transform.rotate(self.image, self.angulo)
-                #rect_rotado = img_rotada.get_rect(center=self.centro_original)
-                rect_rotado = img_rotada.get_rect(center=self.rect.center)
-                pantalla.blit(img_rotada, rect_rotado)
+                if self.angulo == 180:
+                    self.rotacion = False
+                    self.fin_rotacion = True
+                    img_rotada2 = pg.transform.rotate(self.image,180)
+                    rect_rotado2 = img_rotada2.get_rect(center=self.rect.center)
+                    pantalla.blit(img_rotada2,rect_rotado2)
+
+                if self.rotacion:
+                    self.angulo += 2
+                    img_rotada = pg.transform.rotate(self.image, self.angulo)
+                    #rect_rotado = img_rotada.get_rect(center=self.centro_original)
+                    rect_rotado = img_rotada.get_rect(center=self.rect.center)
+                    pantalla.blit(img_rotada, rect_rotado) 
+                    
             else:
                 pantalla.blit(self.image, self.rect)
-
-            if self.angulo > 180:
-                self.angulo = 180
 
     def mover_nave(self, aterrizando):
         "Estos son los controles que permiten mover la nave"
@@ -170,11 +179,10 @@ class Planeta(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = POS_PLANETA
         self.rect.y = (ALTO_P-self.image.get_height())/2
-        self.aparece_planeta = False
+        
 
     def mover_planeta(self, nave_aterrizando):
         if nave_aterrizando:
-            self.aparece_planeta = True
             self.rect.x -= self.velocidad_x
             if self.rect.x < ANCHO_P - self.rect.height:
                 self.rect.x = ANCHO_P - self.rect.height
