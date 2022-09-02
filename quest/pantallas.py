@@ -3,7 +3,7 @@ import random
 
 import pygame as pg
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, VIDAS
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, TIEMPO_FINALIZACION, VIDAS
 
 from .objetos import ContadorVidas, Explosion, Marcador, Meteorito, MeteoritoMediano, Nave, Planeta
 
@@ -126,7 +126,7 @@ class PantallaJuego(Pantalla):
         # Flags de salida del juego y de fase de aterrizaje
         salir = False
         aterrizaje = False
-
+        f_rotacion = False
         # Reproducción de la música del juego (en bucle)
         pg.mixer.music.play(-1)
 
@@ -152,8 +152,9 @@ class PantallaJuego(Pantalla):
             if not aterrizaje:
                 self.pantalla.blit(self.jugador.image, self.jugador.rect)
             else:
-                self.jugador.aterrizar_nave(aterrizaje, self.pantalla)
                 self.planeta.mover_planeta(aterrizaje)
+                self.jugador.aterrizar_nave(aterrizaje, self.pantalla)
+
 
             # Para dibujar y actualizar el grupo de meteoritos
             self.meteoritos.update()
@@ -188,15 +189,16 @@ class PantallaJuego(Pantalla):
                     self.contador_vidas.perder_vida()
 
             # Cuenta puntos por meteoritos esquivados, les asigna puntuación y los elimina de su grupo
-            for meteorito in self.meteoritos.sprites():
-                if meteorito.rect.right < 0:
-                    self.marcador.aumentar(meteorito.puntos)
-                    self.meteoritos.remove(meteorito)
+            if not aterrizaje:
+                for meteorito in self.meteoritos.sprites():
+                    if meteorito.rect.right < 0:
+                        self.marcador.aumentar(meteorito.puntos)
+                        self.meteoritos.remove(meteorito)
 
-            for meteorito_m in self.meteoritos_m.sprites():
-                if meteorito_m.rect.right < 0:
-                    self.marcador.aumentar(meteorito_m.puntos)
-                    self.meteoritos_m.remove(meteorito_m)
+                for meteorito_m in self.meteoritos_m.sprites():
+                    if meteorito_m.rect.right < 0:
+                        self.marcador.aumentar(meteorito_m.puntos)
+                        self.meteoritos_m.remove(meteorito_m)
 
             # Crea nuevos meteoritos al salir de la pantalla
             if not aterrizaje:
@@ -215,13 +217,18 @@ class PantallaJuego(Pantalla):
             self.marcador.pintar_marcador(self.pantalla)
 
             # Condición que activa el flag de aterrizaje
-            if self.marcador.valor >= 200:
+            if self.marcador.valor >= 10:
                 aterrizaje = True
 
             # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
-            if self.jugador.angulo == 180:
-                print("Fin del juego")
-
+            if self.jugador.fin_rotacion:
+                self.pintar_fin_nivel()
+                contador = pg.time.get_ticks()/10000
+                print(contador)
+                if contador > TIEMPO_FINALIZACION:
+                    salir = True
+            
+            
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
 
@@ -238,7 +245,18 @@ class PantallaJuego(Pantalla):
         self.pantalla.blit(self.fondo, (0, 0))
 
     def pintar_fin_nivel(self):
-        pass
+        font_file = os.path.join("resources", "fonts",
+                                 "light_sans_serif_7.ttf")
+        self.tipografia = pg.font.Font(font_file, 50)
+        mensaje = "¡ENHORABUENA! HAS GANADO"
+        texto = self.tipografia.render(mensaje, True, COLOR_TEXTO2)
+        ancho_texto = texto.get_width()
+        pos_x = (ANCHO_P - ancho_texto)/2
+        pos_y = texto.get_height()*3
+        self.pantalla.blit(texto, (pos_x, pos_y))
+
+        
+        
 
     def crear_meteoritos(self):
         """"Este método genera los meteoritos grandes al inicio de la partida, les asigna puntuación y
