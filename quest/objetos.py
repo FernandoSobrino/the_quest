@@ -50,17 +50,18 @@ class Nave(Sprite):
                 if self.angulo == 180:
                     self.rotacion = False
                     self.fin_rotacion = True
-                    img_rotada2 = pg.transform.rotate(self.image,180)
-                    rect_rotado2 = img_rotada2.get_rect(center=self.rect.center)
-                    pantalla.blit(img_rotada2,rect_rotado2)
+                    img_rotada2 = pg.transform.rotate(self.image, 180)
+                    rect_rotado2 = img_rotada2.get_rect(
+                        center=self.rect.center)
+                    pantalla.blit(img_rotada2, rect_rotado2)
 
                 if self.rotacion:
                     self.angulo += 2
                     img_rotada = pg.transform.rotate(self.image, self.angulo)
                     #rect_rotado = img_rotada.get_rect(center=self.centro_original)
                     rect_rotado = img_rotada.get_rect(center=self.rect.center)
-                    pantalla.blit(img_rotada, rect_rotado) 
-                    
+                    pantalla.blit(img_rotada, rect_rotado)
+
             else:
                 pantalla.blit(self.image, self.rect)
 
@@ -179,7 +180,6 @@ class Planeta(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = POS_PLANETA
         self.rect.y = (ALTO_P-self.image.get_height())/2
-        
 
     def mover_planeta(self, nave_aterrizando):
         if nave_aterrizando:
