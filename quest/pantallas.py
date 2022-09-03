@@ -3,10 +3,10 @@ import random
 
 import pygame as pg
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, TIEMPO_FINALIZACION, VIDAS
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, RUTA, TIEMPO_FINALIZACION, VIDAS
 
 from .objetos import ContadorVidas, Explosion, Marcador, Meteorito, MeteoritoMediano, Nave, Planeta
-
+from .records import GestorBD
 
 class Pantalla:
     def __init__(self, pantalla: pg.Surface):
@@ -120,6 +120,8 @@ class PantallaJuego(Pantalla):
         self.musica = pg.mixer.music.load(os.path.join(
             "resources", "sounds", "musica_juego.mp3"))
 
+        self.bd = GestorBD(RUTA)
+
     def bucle_principal(self):
         "Método que controla el juego"
 
@@ -154,7 +156,6 @@ class PantallaJuego(Pantalla):
             else:
                 self.planeta.mover_planeta(aterrizaje)
                 self.jugador.aterrizar_nave(aterrizaje, self.pantalla)
-
 
             # Para dibujar y actualizar el grupo de meteoritos
             self.meteoritos.update()
@@ -217,7 +218,7 @@ class PantallaJuego(Pantalla):
             self.marcador.pintar_marcador(self.pantalla)
 
             # Condición que activa el flag de aterrizaje
-            if self.marcador.valor >= 10:
+            if self.marcador.valor >= 100:
                 aterrizaje = True
 
             # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
@@ -226,15 +227,22 @@ class PantallaJuego(Pantalla):
                 contador = pg.time.get_ticks()/10000
                 print(contador)
                 if contador > TIEMPO_FINALIZACION:
+                    self.bd.pregunta_nombre()
+                    self.bd.guardarRecords(self.bd.nombre,self.marcador.valor)
+                    print(self.bd.nombre)
+                    print(self.marcador.valor)
                     salir = True
-            
-            
+
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
 
-            # Estas líneas de código sirven para cerrar el juego si se pierden todas las vidas
+            # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje
+            
+
+            # Para cerrar el juego si se pierden todas las vidas
             if self.contador_vidas.vidas == 0:
-                salir = True
+                salir = self.contador_vidas.perder_vida()
+                print("Perdiste todas las vidas")
 
     # -------------MÉTODOS DE FUNCIONAMIENTO INDEPENDIENTES DE LAS CLASES-----------#
 
@@ -254,9 +262,6 @@ class PantallaJuego(Pantalla):
         pos_x = (ANCHO_P - ancho_texto)/2
         pos_y = texto.get_height()*3
         self.pantalla.blit(texto, (pos_x, pos_y))
-
-        
-        
 
     def crear_meteoritos(self):
         """"Este método genera los meteoritos grandes al inicio de la partida, les asigna puntuación y
