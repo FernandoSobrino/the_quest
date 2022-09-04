@@ -5,7 +5,9 @@ import sqlite3
 class GestorBD:
     def __init__(self, ruta):
         self.ruta = ruta
+
     def obtenerRecords(self):
+        "Consulta todos los records almacenados en la base de datos"
         consulta = "SELECT * FROM records ORDER BY puntos DESC"
 
         # 1- Conectar con la base de datos
@@ -36,33 +38,32 @@ class GestorBD:
 
         return self.records
 
-
-    def guardarRecords(self,nombre,puntos):
+    def guardarRecords(self, nombre, puntos):
+        "Guarda nuevo record en la base de datos"
         consulta = "INSERT INTO records (nombre,puntos) VALUES (?,?)"
         conexion = sqlite3.connect(self.ruta)
         cursor = conexion.cursor()
-        cursor.execute(consulta,(nombre,puntos))
+        cursor.execute(consulta, (nombre, puntos))
         conexion.commit()
         conexion.close()
 
-    
-    """
-    def actualizarRecords(self, puntos):
-        self.puntos = puntos
-
-        for record in self.records:
-            for clave in self.records[record]:
-                print(f"{clave}:{record[clave]}")
-    """
-
+    def eliminarRecords(self):
+        "Método para pruebas. Manejar con cuidado. Elimina todos los datos"
+        consulta = "DELETE FROM records"
+        conexion = sqlite3.connect(self.ruta)
+        cursor = conexion.cursor()
+        cursor.execute(consulta)
+        conexion.commit()
+        conexion.close()
 
     def pregunta_nombre(self):
-        loop = True
-        while loop:
+        pedir_nombre = True
+        while pedir_nombre:
             self.nombre = input("¿Cuál es tu nombre?")
             try:
                 if len(self.nombre) == 3:
-                    loop = False
+                    pedir_nombre = False
             except:
                 print("Sólo puede tener tres caracteres")
+
         return self.nombre
