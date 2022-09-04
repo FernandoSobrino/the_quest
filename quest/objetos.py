@@ -174,9 +174,8 @@ class MeteoritoMediano(Meteorito):
 class Planeta(Sprite):
     velocidad_x = 1
 
-    def __init__(self):
-        self.image = pg.image.load(os.path.join("resources", "images",
-                                                "planeta1.png"))
+    def __init__(self,imagen):
+        self.image = imagen
         self.rect = self.image.get_rect()
         self.rect.x = POS_PLANETA
         self.rect.y = (ALTO_P-self.image.get_height())/2
