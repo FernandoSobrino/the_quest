@@ -1,5 +1,6 @@
 import os
 import random
+from sys import byteorder
 
 import pygame as pg
 
@@ -7,6 +8,7 @@ from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, RUTA, TIEMPO_FINA
 
 from .objetos import ContadorVidas, Explosion, Marcador, Meteorito, MeteoritoMediano, Nave, Planeta
 from .records import GestorBD
+
 
 class Pantalla:
     def __init__(self, pantalla: pg.Surface):
@@ -48,7 +50,7 @@ class PantallaPrincipal(Pantalla):
 
     def pintar_fondo(self):
         self.fondo = pg.image.load(os.path.join(
-            "resources", "images", "fondo_intro.jpg")).convert()
+            "resources", "images", "fondo_intro.jpg"))
         self.pantalla.blit(self.fondo, (0, 0))
 
     def pintar_texto_instrucciones(self):
@@ -120,6 +122,7 @@ class PantallaJuego(Pantalla):
         self.musica = pg.mixer.music.load(os.path.join(
             "resources", "sounds", "musica_juego.mp3"))
 
+        # carga del gestor de la base de datos
         self.bd = GestorBD(RUTA)
 
     def bucle_principal(self):
@@ -128,7 +131,6 @@ class PantallaJuego(Pantalla):
         # Flags de salida del juego y de fase de aterrizaje
         salir = False
         aterrizaje = False
-        f_rotacion = False
         # Reproducción de la música del juego (en bucle)
         pg.mixer.music.play(-1)
 
@@ -225,10 +227,10 @@ class PantallaJuego(Pantalla):
             if self.jugador.fin_rotacion:
                 self.pintar_fin_nivel()
                 contador = pg.time.get_ticks()/10000
-                print(contador)
+                # print(contador)
                 if contador > TIEMPO_FINALIZACION:
                     self.bd.pregunta_nombre()
-                    self.bd.guardarRecords(self.bd.nombre,self.marcador.valor)
+                    self.bd.guardarRecords(self.bd.nombre, self.marcador.valor)
                     print(self.bd.nombre)
                     print(self.marcador.valor)
                     salir = True
@@ -237,7 +239,6 @@ class PantallaJuego(Pantalla):
             pg.display.flip()
 
             # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje
-            
 
             # Para cerrar el juego si se pierden todas las vidas
             if self.contador_vidas.vidas == 0:
@@ -249,7 +250,7 @@ class PantallaJuego(Pantalla):
     def pintar_fondo(self):
         "Este método pinta el fondo de estrellas de la pantalla del juego"
         self.fondo = pg.image.load(os.path.join(
-            "resources", "images", "fondo_nivel.jpeg")).convert()
+            "resources", "images", "fondo_nivel.jpeg"))
         self.pantalla.blit(self.fondo, (0, 0))
 
     def pintar_fin_nivel(self):
@@ -280,3 +281,66 @@ class PantallaJuego(Pantalla):
             puntos_m = (i + 20) - i
             meteorito_m = MeteoritoMediano(puntos_m)
             self.meteoritos_m.add(meteorito_m)
+
+
+class PantallaRecords(Pantalla):
+    def __init__(self, pantalla: pg.Surface):
+        super().__init__(pantalla)
+        # self.musica = pg.mixer.music.load(os.path.join(
+        # "resources", "sounds", "musica_records.mp3"))
+        self.bd = GestorBD(RUTA)
+        self.bd.obtenerRecords()
+        font_file = os.path.join("resources", "fonts", "game_sans_serif_7.ttf")
+        self.tipografia = pg.font.Font(font_file, 20)
+
+    def bucle_principal(self):
+        salir = False
+        borde = 100
+        d = 'id'
+        nombres_record = []
+        nombres_render = []
+        puntos_record = []
+        puntos_render = []
+
+        for record in self.bd.records:
+            record.pop(d)
+            for value in record.values():
+                if isinstance(value, str):
+                    nombres_record.append(value)
+                if isinstance(value, int):
+                    puntos_record.append(value)
+
+        for nombre in nombres_record:
+            texto_render = self.tipografia.render(str(nombre),
+                                                  True, COLOR_TEXTO2)
+            nombres_render.append(texto_render)
+
+        for punto in puntos_record:
+            texto_render2 = self.tipografia.render(str(punto),
+                                                   True, COLOR_TEXTO2)
+            puntos_render.append(texto_render2)
+
+        while not salir:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+
+            self.pintar_fondo()
+
+            for i in range(len(nombres_render)):
+                pos_x = ANCHO_P/2 - texto_render.get_width()
+                pos_y = i*texto_render.get_height() + borde
+                self.pantalla.blit(nombres_render[i], (pos_x, pos_y))
+
+            for j in range(len(puntos_render)):
+                pos_x = ANCHO_P/2 - texto_render2.get_width() + 200
+                pos_y = j*texto_render2.get_height() + borde
+                self.pantalla.blit(puntos_render[j], (pos_x, pos_y))
+
+            pg.display.flip()
+
+    def pintar_fondo(self):
+        "Este método pinta el fondo de estrellas de la pantalla de records"
+        self.fondo = pg.image.load(os.path.join(
+            "resources", "images", "fondo_intro.jpg"))
+        self.pantalla.blit(self.fondo, (0, 0))
