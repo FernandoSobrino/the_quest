@@ -45,8 +45,6 @@ class Nave(Sprite):
                 self.rect.x = ANCHO_P/2 + 30
                 self.rotacion = True
 
-                # self.centro_original = self.image.get_rect(
-                # topleft=(self.rect.x,self.rect.y)).center
                 if self.angulo == 180:
                     self.rotacion = False
                     self.fin_rotacion = True
@@ -174,7 +172,7 @@ class MeteoritoMediano(Meteorito):
 class Planeta(Sprite):
     velocidad_x = 1
 
-    def __init__(self,imagen):
+    def __init__(self, imagen):
         self.image = imagen
         self.rect = self.image.get_rect()
         self.rect.x = POS_PLANETA
