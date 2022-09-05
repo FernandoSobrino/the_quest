@@ -1,7 +1,7 @@
 import pygame as pg
 
 from . import ALTO_P, ANCHO_P
-from .pantallas import Pantalla, PantallaPrincipal, PantallaJuego
+from .pantallas import Pantalla, PantallaPrincipal, PantallaJuego, PantallaJuego2, PantallaRecords
 
 
 class Quest:
@@ -13,7 +13,8 @@ class Quest:
         self.pantallas = [
             Pantalla(self.display),
             PantallaPrincipal(self.display),
-            PantallaJuego(self.display)]
+            PantallaJuego(self.display),PantallaJuego2(self.display),
+            PantallaRecords(self.display)]
 
     def jugar(self):
         for pantalla in self.pantallas:
