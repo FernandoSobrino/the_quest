@@ -190,7 +190,7 @@ class PantallaJuego(Pantalla):
     def crear_meteoritos(self):
         """"Este método genera los meteoritos grandes al inicio de la partida, les asigna puntuación y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos = random.randint(1, 3)
+        cantidad_meteoritos = random.randrange(1, 3)
         for i in range(cantidad_meteoritos):
             puntos = (i + 10) - i
             meteorito = Meteorito(puntos)
@@ -199,7 +199,7 @@ class PantallaJuego(Pantalla):
     def crear_meteoritos_m(self):
         """"Este método genera los meteoritos medianos al inicio de la partida, les asigna puntuación
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos_m = random.randint(2, 4)
+        cantidad_meteoritos_m = random.randrange(2, 5)
         for i in range(cantidad_meteoritos_m):
             puntos_m = (i + 20) - i
             meteorito_m = MeteoritoMediano(puntos_m)
@@ -226,24 +226,19 @@ class PantallaJuego(Pantalla):
                 if meteorito.rect.right < 0:
                     self.marcador.aumentar(meteorito.puntos)
                     self.meteoritos.remove(meteorito)
+            if len(self.meteoritos.sprites()) < 1:
+                self.crear_meteoritos()
 
             for meteorito_m in self.meteoritos_m.sprites():
-                if meteorito_m.rect.right < 0:
-                    self.marcador.aumentar(meteorito_m.puntos)
-                    self.meteoritos_m.remove(meteorito_m)
-
-        # Crea nuevos meteoritos al salir de la pantalla
-            if not aterrizar:
-                if not meteorito.alive():
-                    self.crear_meteoritos()
-                if not meteorito_m.alive():
-                    self.crear_meteoritos_m()
-            # Si la nave aterriza, ya no se crean más
-            else:
-                if meteorito.rect.right < 0:
-                    meteorito.remove(self.meteoritos)
-                if meteorito_m.rect.right < 0:
-                    meteorito_m.remove(self.meteoritos_m)
+                if not aterrizar:
+                    if meteorito_m.rect.right < 0:
+                        self.marcador.aumentar(meteorito_m.puntos)
+                        self.meteoritos_m.remove(meteorito_m)
+            if len(self.meteoritos_m.sprites()) < 1:
+                self.crear_meteoritos_m()
+        else:
+            self.meteoritos.clear(self.pantalla, self.pantalla)
+            self.meteoritos_m.clear(self.pantalla, self.pantalla)
 
     def mover_nave_y_planeta(self, aterrizar):
         "Este método incluye las maniobras de la nave y el comportamiento del planeta"
@@ -375,7 +370,7 @@ class PantallaJuego2(PantallaJuego):
     def crear_meteoritos(self):
         """"Este método genera los meteoritos grandes al inicio de la partida, les asigna puntuación y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos = random.randint(1, 3)
+        cantidad_meteoritos = random.randrange(2, 5)
         for i in range(cantidad_meteoritos):
             puntos = (i + 10) - i
             meteorito = Meteorito(puntos)
@@ -384,7 +379,7 @@ class PantallaJuego2(PantallaJuego):
     def crear_meteoritos_m(self):
         """"Este método genera los meteoritos medianos al inicio de la partida, les asigna puntuación
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos_m = random.randint(2, 4)
+        cantidad_meteoritos_m = random.randrange(4, 8)
         for i in range(cantidad_meteoritos_m):
             puntos_m = (i + 20) - i
             meteorito_m = MeteoritoMediano(puntos_m)
