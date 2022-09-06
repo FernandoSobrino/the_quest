@@ -402,33 +402,23 @@ class PantallaRecords(Pantalla):
         self.nombres_render = []
         self.puntos_record = []
         self.puntos_render = []
-        self.titulo_nombre = "NOMBRE"
-        self.titulo_puntos = "PUNTOS"
 
     def bucle_principal(self):
         salir = False
-
     # Para almacenar los valores de NOMBRE y PUNTOS en listas independientes
     # para poder ser renderizados
-        self.records = self.bd.obtenerRecords()
-        for record in self.records:
-            record.pop('id')
-            for value in record.values():
-                if isinstance(value, str):
-                    self.nombres_record.append(value)
-                else:
-                    self.puntos_record.append(value)
+        self.cargar_datos()
 
     # Renderizado de cada una de las listas de NOMBRE y PUNTOS
         for nombre in self.nombres_record:
-            texto_render = self.tipografia.render(str(nombre),
-                                                  True, COLOR_TEXTO2)
-            self.nombres_render.append(texto_render)
+            texto_renderizar = self.tipografia.render(str(nombre),
+                                                      True, COLOR_TEXTO2)
+            self.nombres_render.append(texto_renderizar)
 
         for punto in self.puntos_record:
-            texto_render2 = self.tipografia.render(str(punto),
-                                                   True, COLOR_TEXTO)
-            self.puntos_render.append(texto_render2)
+            texto_renderizar2 = self.tipografia.render(str(punto),
+                                                       True, COLOR_TEXTO)
+            self.puntos_render.append(texto_renderizar2)
 
         # Bucle de funcionamiento del juego
         while not salir:
@@ -440,8 +430,8 @@ class PantallaRecords(Pantalla):
             self.pintar_fondo()
 
             # Para pintar los nombres y los records en la pantalla
-            self.pintar_records(self.nombres_render, self.puntos_render,
-                                texto_render, texto_render2)
+            self.pintar_records(self.nombres_render, self.puntos_render, texto_renderizar,
+                                texto_renderizar2)
 
             # Recarga de todos los elementos presentes en la pantalla
             pg.display.flip()
@@ -450,39 +440,52 @@ class PantallaRecords(Pantalla):
 # -------- MÉTODOS PARA PINTAR LOS ELEMENTOS QUE SE MUESTRAN EN LA PANTALLA ---------
 
 
+    def cargar_datos(self):
+        """Este método almacena los elementos a pintar en listas independientes para
+        poder renderizarlos después"""
+        self.records = self.bd.obtenerRecords()
+        for record in self.records:
+            record.pop('id')
+            for value in record.values():
+                if isinstance(value, str):
+                    self.nombres_record.append(value)
+                else:
+                    self.puntos_record.append(value)
+
     def pintar_fondo(self):
         "Este método pinta el fondo de estrellas de la pantalla de records"
         self.fondo = pg.image.load(os.path.join(
             "resources", "images", "fondo_intro.jpg"))
         self.pantalla.blit(self.fondo, (0, 0))
 
-    def pintar_records(self, nombres, puntos,
-                       texto_renderizar, texto_renderizar2):
-
+    def pintar_records(self, nombres, puntos, renderizado, renderizado2):
+        "Este método hace el pintado de información (títulos y datos) de los records"
         borde = 200
         separacion_x = 200
         pos_x_titulo = 300
         pos_x_titulo2 = 600
         pos_y_titulo = 100
+        titulo_nombre = "NOMBRE"
+        titulo_puntos = "PUNTOS"
 
         # para pintar los títulos de los records
         nombres_jugador_render = self.tipo_titulos.render(
-            self.titulo_nombre, True, COLOR_TEXTO2)
+            titulo_nombre, True, COLOR_TEXTO2)
         self.pantalla.blit(nombres_jugador_render,
                            (pos_x_titulo, pos_y_titulo))
 
         puntos_jugador_render = self.tipo_titulos.render(
-            self.titulo_puntos, True, COLOR_TEXTO)
+            titulo_puntos, True, COLOR_TEXTO)
         self.pantalla.blit(puntos_jugador_render,
                            (pos_x_titulo2, pos_y_titulo))
 
-        # para pintar los records(nombres y puntos)
+        # para pintar los datos de los records
         for i in range(len(nombres)):
-            pos_x = ANCHO_P/3 + texto_renderizar.get_width() - 50
-            pos_y = i * texto_renderizar.get_height() + borde
+            pos_x = ANCHO_P/3 + renderizado.get_width() - 50
+            pos_y = i * renderizado.get_height() + borde
             self.pantalla.blit(nombres[i], (pos_x, pos_y))
 
         for j in range(len(puntos)):
-            pos_x2 = ANCHO_P/3 + texto_renderizar2.get_width() + separacion_x + 50
-            pos_y2 = j * texto_renderizar2.get_height() + borde
+            pos_x2 = ANCHO_P/3 + renderizado2.get_width() + separacion_x + 50
+            pos_y2 = j * renderizado.get_height() + borde
             self.pantalla.blit(puntos[j], (pos_x2, pos_y2))
