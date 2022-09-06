@@ -59,21 +59,6 @@ class GestorBD:
         conexion.commit()
         conexion.close()
 
-    """
-    def preguntar_nombre(self):
-        pedir_nombre = True
-        while pedir_nombre:
-            self.nombre = input("¿CUÁL ES TU NOMBRE? ")
-            try:
-                if len(self.nombre) == 3:
-                    pedir_nombre = False
-            except:
-                print("Sólo puede tener tres caracteres")
-
-        return self.nombre
-    """
-
-
 class InputBox:
 
     def __init__(self, pantalla: pg.Surface, color_texto="white", color_fondo="black", title=""):
