@@ -11,7 +11,7 @@ class GestorBD:
 
     def obtenerRecords(self):
         "Consulta todos los records almacenados en la base de datos"
-        consulta = "SELECT * FROM records ORDER BY puntos DESC"
+        consulta = "SELECT * FROM records ORDER BY puntos DESC LIMIT 10"
 
         # 1- Conectar con la base de datos
         conexion = sqlite3.connect(self.ruta)
