@@ -156,10 +156,7 @@ class PantallaJuego(Pantalla):
 
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave. También desactiva colisiones durante el aterrizaje
-            self.gestionar_colisiones(aterrizaje)
-
-            # Gestiona el comportamiento de los meteoritos en la partida
-            self.comportamiento_meteoritos(aterrizaje)
+            self.gestionar_meteoritos(aterrizaje)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
@@ -205,7 +202,7 @@ class PantallaJuego(Pantalla):
             meteorito_m = MeteoritoMediano(puntos_m)
             self.meteoritos_m.add(meteorito_m)
 
-    def gestionar_colisiones(self, aterrizar):
+    def gestionar_meteoritos(self, aterrizar):
         if not aterrizar:
             colision = pg.sprite.spritecollide(
                 self.jugador, self.meteoritos, True)
@@ -219,27 +216,26 @@ class PantallaJuego(Pantalla):
                 self.exp_sound.play()
                 self.contador_vidas.perder_vida()
 
-    def comportamiento_meteoritos(self, aterrizar):
-        "Este método controla el comportamiento de los meteoritos durante la partida"
-        if not aterrizar:
             for meteorito in self.meteoritos.sprites():
                 if meteorito.rect.right < 0:
-                    self.marcador.aumentar(meteorito.puntos)
+                    if not self.jugador.nave_escondida:
+                        self.marcador.aumentar(meteorito.puntos)
                     self.meteoritos.remove(meteorito)
             if len(self.meteoritos.sprites()) < 1:
                 self.crear_meteoritos()
 
             for meteorito_m in self.meteoritos_m.sprites():
-                if not aterrizar:
-                    if meteorito_m.rect.right < 0:
+                if meteorito_m.rect.right < 0:
+                    if not self.jugador.nave_escondida:
                         self.marcador.aumentar(meteorito_m.puntos)
-                        self.meteoritos_m.remove(meteorito_m)
+                    self.meteoritos_m.remove(meteorito_m)
             if len(self.meteoritos_m.sprites()) < 1:
                 self.crear_meteoritos_m()
         else:
             self.meteoritos.clear(self.pantalla, self.pantalla)
             self.meteoritos_m.clear(self.pantalla, self.pantalla)
 
+    
     def mover_nave_planeta(self, aterrizar):
         "Este método incluye las maniobras de la nave y el comportamiento del planeta"
         self.jugador.update()
@@ -332,10 +328,7 @@ class PantallaJuego2(PantallaJuego):
 
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave. También desactiva colisiones durante el aterrizaje
-            self.gestionar_colisiones(aterrizaje)
-
-            # Gestiona el comportamiento de los meteoritos en la partida
-            self.comportamiento_meteoritos(aterrizaje)
+            self.gestionar_meteoritos(aterrizaje)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
@@ -350,9 +343,9 @@ class PantallaJuego2(PantallaJuego):
                 contador = pg.time.get_ticks()/10000
                 # print(contador)
                 if contador > TIEMPO_FINALIZACION:
-                    bd = GestorBD(RUTA)
                     inputbox = InputBox(self.pantalla)
-                    nombre = inputbox.get_text()
+                    nombre = inputbox.recoger_nombre()
+                    bd = GestorBD(RUTA)
                     bd.guardarRecords(nombre, self.marcador.valor)
                     #print(nombre, self.marcador.valor)
                     salir = True
@@ -437,9 +430,7 @@ class PantallaRecords(Pantalla):
             pg.display.flip()
 
 
-# -------- MÉTODOS PARA PINTAR LOS ELEMENTOS QUE SE MUESTRAN EN LA PANTALLA ---------
-
-
+# -------- MÉTODOS PARA PINTAR LOS ELEMENTOS QUE SE MUESTRAN EN LA PANTALLA --------- #
     def cargar_datos(self):
         """Este método almacena los elementos a pintar en listas independientes para
         poder renderizarlos después"""
