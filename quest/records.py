@@ -2,7 +2,7 @@ import os
 import pygame as pg
 import sqlite3
 
-from . import ANCHO_P, ALTO_P
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, COLOR_TEXTO_INPUT
 
 
 class GestorBD:
@@ -22,7 +22,7 @@ class GestorBD:
         # 3- Pasar la consulta a SQL y ejecutar
         cursor.execute(consulta)
 
-        self.records = []
+        records = []
         nombres_columnas = []
 
         for desc_columna in cursor.description:
@@ -30,16 +30,16 @@ class GestorBD:
 
         datos = cursor.fetchall()
         for dato in datos:
-            self.record = {}
+            record = {}
             indice = 0
             for nombre in nombres_columnas:
-                self.record[nombre] = dato[indice]
+                record[nombre] = dato[indice]
                 indice += 1
-            self.records.append(self.record)
+            records.append(record)
 
         conexion.close()
 
-        return self.records
+        return records
 
     def guardarRecords(self, nombre, puntos):
         "Guarda nuevo record en la base de datos"
@@ -59,20 +59,21 @@ class GestorBD:
         conexion.commit()
         conexion.close()
 
+
 class InputBox:
 
-    def __init__(self, pantalla: pg.Surface, color_texto="white", color_fondo="black", title=""):
+    def __init__(self, pantalla: pg.Surface):
         font_file = os.path.join(
             "resources", "fonts", "game_sans_serif_7.ttf")
         self.tipografia = pg.font.Font(font_file, 20)
         self.texto = ""
-        self.color_fondo = color_fondo
-        self.color_texto = color_texto
+        self.color_fondo = COLOR_TEXTO2
+        self.color_texto = COLOR_TEXTO_INPUT
         self.pantalla = pantalla
         self.padding = 30
-        self.crear_elementos_fijos()
+        self.pintar_elementos_fijos()
 
-    def get_text(self):
+    def recoger_nombre(self):
         salir = False
         while not salir:
             for event in pg.event.get():
@@ -85,6 +86,8 @@ class InputBox:
                         salir = True
                     else:
                         self.texto += event.unicode
+                if event.type == pg.KEYDOWN and len(self.texto) > 2:
+                    self.texto = self.texto[:3]
             self.pintar()
             pg.display.flip()
         return self.texto
@@ -99,10 +102,10 @@ class InputBox:
         pos_y = self.y_titulo + self.titulo.get_height()
         self.pantalla.blit(superficie_texto, (pos_x, pos_y))
 
-    def crear_elementos_fijos(self):
+    def pintar_elementos_fijos(self):
         # el título
         self.titulo = self.tipografia.render(
-            "Nuevo record. Escribe tu nombre:", True, self.color_texto, self.color_fondo)
+            "¡RECORD! INSERTA TUS INICIALES(3)", True, self.color_texto, self.color_fondo)
         self.x_titulo = (ANCHO_P-self.titulo.get_width())//2
         self.y_titulo = (ALTO_P-self.titulo.get_height())//2
 
