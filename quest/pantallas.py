@@ -5,7 +5,7 @@ import pygame as pg
 from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, RUTA, TIEMPO_FINALIZACION, VIDAS
 
 from .objetos import ContadorVidas, Explosion, Marcador, Meteorito, MeteoritoMediano, Nave, Planeta
-from .records import GestorBD
+from .records import GestorBD, InputBox
 
 
 class Pantalla:
@@ -149,7 +149,7 @@ class PantallaJuego(Pantalla):
             self.pintar_fondo()
 
             # Para mover y pintar la nave y mover el planeta cuando la nave aterrice
-            self.mover_nave_y_planeta(aterrizaje)
+            self.mover_nave_planeta(aterrizaje)
 
             # Para pintar objetos que forman parte de la partida
             self.pintar_objetos_partida()
@@ -159,7 +159,7 @@ class PantallaJuego(Pantalla):
             self.gestionar_colisiones(aterrizaje)
 
             # Gestiona el comportamiento de los meteoritos en la partida
-            self.gestionar_comp_meteoritos(aterrizaje)
+            self.comportamiento_meteoritos(aterrizaje)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
@@ -219,8 +219,8 @@ class PantallaJuego(Pantalla):
                 self.exp_sound.play()
                 self.contador_vidas.perder_vida()
 
-    def gestionar_comp_meteoritos(self, aterrizar):
-        # Cuenta puntos por meteoritos esquivados, les asigna puntuación y los elimina de su grupo
+    def comportamiento_meteoritos(self, aterrizar):
+        "Este método controla el comportamiento de los meteoritos durante la partida"
         if not aterrizar:
             for meteorito in self.meteoritos.sprites():
                 if meteorito.rect.right < 0:
@@ -240,7 +240,7 @@ class PantallaJuego(Pantalla):
             self.meteoritos.clear(self.pantalla, self.pantalla)
             self.meteoritos_m.clear(self.pantalla, self.pantalla)
 
-    def mover_nave_y_planeta(self, aterrizar):
+    def mover_nave_planeta(self, aterrizar):
         "Este método incluye las maniobras de la nave y el comportamiento del planeta"
         self.jugador.update()
         if not aterrizar:
@@ -295,7 +295,7 @@ class PantallaJuego2(PantallaJuego):
         self.planeta = Planeta(imagen_planeta2)
 
         # carga del gestor de la base de datos
-        self.bd = GestorBD(RUTA)
+        #self.bd = GestorBD(RUTA)
 
     def bucle_principal(self):
         "Método que controla el juego"
@@ -325,7 +325,7 @@ class PantallaJuego2(PantallaJuego):
             self.pintar_fondo()
 
             # Para mover y pintar la nave y mover el planeta cuando la nave aterrice
-            self.mover_nave_y_planeta(aterrizaje)
+            self.mover_nave_planeta(aterrizaje)
 
             # Para pintar los elementos de la partida
             self.pintar_objetos_partida()
@@ -335,7 +335,7 @@ class PantallaJuego2(PantallaJuego):
             self.gestionar_colisiones(aterrizaje)
 
             # Gestiona el comportamiento de los meteoritos en la partida
-            self.gestionar_comp_meteoritos(aterrizaje)
+            self.comportamiento_meteoritos(aterrizaje)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
@@ -350,9 +350,11 @@ class PantallaJuego2(PantallaJuego):
                 contador = pg.time.get_ticks()/10000
                 # print(contador)
                 if contador > TIEMPO_FINALIZACION:
-                    self.bd.preguntar_nombre()
-                    self.bd.guardarRecords(self.bd.nombre, self.marcador.valor)
-                    print(self.bd.nombre, self.marcador.valor)
+                    bd = GestorBD(RUTA)
+                    inputbox = InputBox(self.pantalla)
+                    nombre = inputbox.get_text()
+                    bd.guardarRecords(nombre, self.marcador.valor)
+                    #print(nombre, self.marcador.valor)
                     salir = True
 
             # Actualización de todos los elementos que se están mostrando en la partida
@@ -392,11 +394,10 @@ class PantallaRecords(Pantalla):
         # self.musica = pg.mixer.music.load(os.path.join(
         # "resources", "sounds", "musica_records.mp3"))
         self.bd = GestorBD(RUTA)
-        self.records = self.bd.obtenerRecords()
+        self.records = []
         font_file = os.path.join("resources", "fonts", "game_sans_serif_7.ttf")
         self.tipografia = pg.font.Font(font_file, 25)
         self.tipo_titulos = pg.font.Font(font_file, 30)
-
         self.nombres_record = []
         self.nombres_render = []
         self.puntos_record = []
@@ -409,6 +410,7 @@ class PantallaRecords(Pantalla):
 
     # Para almacenar los valores de NOMBRE y PUNTOS en listas independientes
     # para poder ser renderizados
+        self.records = self.bd.obtenerRecords()
         for record in self.records:
             record.pop('id')
             for value in record.values():
