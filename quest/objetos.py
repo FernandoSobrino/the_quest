@@ -84,7 +84,7 @@ class Nave(Sprite):
 
         # Esta parte del código permite devolver la nave a su punto original pasado un tiempo
         # tras perder una vida
-        if self.nave_escondida and pg.time.get_ticks()/1000 - self.tiempo_renacer > 1.5:
+        if self.nave_escondida and pg.time.get_ticks()/1000 - self.tiempo_renacer > 2:
             self.nave_escondida = False
             self.rect.centery = ALTO_P/2
             self.rect.x = MARGEN_LATERAL
