@@ -4,7 +4,7 @@ import pygame as pg
 
 from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, RUTA, TIEMPO_FINALIZACION, VIDAS
 
-from .objetos import ContadorVidas, Explosion, Marcador, Meteorito, MeteoritoMediano, Nave, Planeta
+from .objetos import Explosion, Meteorito, MeteoritoMediano, Nave, Planeta
 from .records import GestorBD, InputBox
 
 
@@ -87,11 +87,8 @@ class PantallaPrincipal(Pantalla):
 
 
 class PantallaJuego(Pantalla):
-    marcador = 0
-    vidas = VIDAS
-    #vidas = 500
 
-    def __init__(self, pantalla: pg.Surface):
+    def __init__(self, pantalla: pg.Surface, vidas, marcador):
         super().__init__(pantalla)
 
         # creación de la nave
@@ -113,10 +110,10 @@ class PantallaJuego(Pantalla):
         self.explosiones = pg.sprite.Group()
 
         # creación del contador de vidas
-        PantallaJuego.vidas = ContadorVidas(VIDAS)
+        self.vidas = vidas
 
         # creación del marcador de puntos
-        PantallaJuego.marcador = Marcador()
+        self.marcador = marcador
 
         # carga del sonido de la explosión
         self.exp_sound = pg.mixer.Sound(os.path.join(
@@ -139,7 +136,7 @@ class PantallaJuego(Pantalla):
             self.reloj.tick(FPS)
 
             # para medir el tiempo que transcurre durante la partida
-            contador_juego = pg.time.get_ticks()/1000
+            #contador_juego = pg.time.get_ticks()/1000
 
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
@@ -169,25 +166,29 @@ class PantallaJuego(Pantalla):
             self.marcador.pintar_marcador(self.pantalla)
 
             # Condición que activa el flag de aterrizaje (tiempo transcurrido)
+            """
             print(aterrizaje, contador_juego)
             if contador_juego >= 45:
+                aterrizaje = True
+            """
+            if self.marcador.valor > 100:
                 aterrizaje = True
 
             # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
             if self.jugador.fin_rotacion:
                 self.pintar_fin_nivel()
-                contador_finalizacion = pg.time.get_ticks()/10000
+                #contador_finalizacion = pg.time.get_ticks()/10000
                 # print(contador)
                 # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje
-                if contador_finalizacion > TIEMPO_FINALIZACION:
-                    salir = True
+                # if contador_finalizacion > TIEMPO_FINALIZACION:
+                salir = True
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
 
             # Para cerrar el juego si se pierden todas las vidas
-            if PantallaJuego.vidas == 0:
-                salir = PantallaJuego.vidas.perder_vida()
+            if self.vidas == 0:
+                pg.quit()
                 print("Perdiste todas las vidas")
 
     # -------------MÉTODOS DE FUNCIONAMIENTO FUERA DEL BUCLE PRINCIPAL-----------#
@@ -204,7 +205,7 @@ class PantallaJuego(Pantalla):
     def crear_meteoritos_m(self):
         """"Este método genera los meteoritos medianos al inicio de la partida, les asigna puntuación
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos_m = random.randrange(2, 5)
+        cantidad_meteoritos_m = random.randrange(2, 4)
         for i in range(cantidad_meteoritos_m):
             puntos_m = (i + 20) - i
             meteorito_m = MeteoritoMediano(puntos_m)
@@ -222,7 +223,7 @@ class PantallaJuego(Pantalla):
                 self.explosiones.add(explosion)
                 self.jugador.esconder_nave()
                 self.exp_sound.play()
-                PantallaJuego.vidas.perder_vida()
+                self.vidas.perder_vida()
 
             for meteorito in self.meteoritos.sprites():
                 if meteorito.rect.right < 0:
@@ -285,12 +286,12 @@ class PantallaJuego(Pantalla):
         self.explosiones.draw(self.pantalla)
 
         # Para pintar el marcador de vidas
-        PantallaJuego.vidas.pintar_marcador_vidas(self.pantalla)
+        self.vidas.pintar_marcador_vidas(self.pantalla)
 
 
 class PantallaJuego2(PantallaJuego):
-    def __init__(self, pantalla: pg.Surface):
-        super().__init__(pantalla)
+    def __init__(self, pantalla: pg.Surface, vidas, marcador):
+        super().__init__(pantalla, vidas, marcador)
 
         # creación del planeta
         imagen_planeta2 = pg.image.load(os.path.join("resources", "images",
@@ -311,7 +312,7 @@ class PantallaJuego2(PantallaJuego):
             self.reloj.tick(FPS)
 
             # para medir el tiempo que transcurre durante la partida
-            contador_juego = pg.time.get_ticks()/1000
+            #contador_juego = pg.time.get_ticks()/1000
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
             ver problemas de ejecución del juego
@@ -341,22 +342,25 @@ class PantallaJuego2(PantallaJuego):
             self.marcador.pintar_marcador(self.pantalla)
 
             # Condición que activa el flag de aterrizaje (tiempo transcurrido)
+            """
             print(aterrizaje, contador_juego)
             if contador_juego >= 120:
+            """
+            if self.marcador.valor > 200:
                 aterrizaje = True
 
             # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
             if self.jugador.fin_rotacion:
                 self.pintar_fin_nivel()
-                contador = pg.time.get_ticks()/10000
+                #contador = pg.time.get_ticks()/10000
                 # print(contador)
-                if contador > TIEMPO_FINALIZACION:
-                    inputbox = InputBox(self.pantalla)
-                    nombre = inputbox.recoger_nombre()
-                    bd = GestorBD(RUTA)
-                    bd.guardarRecords(nombre, self.marcador.valor)
-                    #print(nombre, self.marcador.valor)
-                    salir = True
+                # if contador > TIEMPO_FINALIZACION:
+                inputbox = InputBox(self.pantalla)
+                nombre = inputbox.recoger_nombre()
+                bd = GestorBD(RUTA)
+                bd.guardarRecords(nombre, self.marcador.valor)
+                #print(nombre, self.marcador.valor)
+                salir = True
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
@@ -364,8 +368,8 @@ class PantallaJuego2(PantallaJuego):
             # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje
 
             # Para cerrar el juego si se pierden todas las vidas
-            if PantallaJuego.vidas == 0:
-                salir = PantallaJuego.vidas.perder_vida()
+            if self.vidas.vidas == 0:
+                pg.quit()
                 print("Perdiste todas las vidas")
 
     # -------------MÉTODOS DE FUNCIONAMIENTO DIFERENTES DEL NIVEL 1 (EN PROGRESO)-----------#
@@ -373,7 +377,7 @@ class PantallaJuego2(PantallaJuego):
     def crear_meteoritos(self):
         """"Este método genera los meteoritos grandes al inicio de la partida, les asigna puntuación y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos = random.randrange(2, 5)
+        cantidad_meteoritos = random.randrange(2, 4)
         for i in range(cantidad_meteoritos):
             puntos = (i + 10) - i
             meteorito = Meteorito(puntos)
@@ -382,7 +386,7 @@ class PantallaJuego2(PantallaJuego):
     def crear_meteoritos_m(self):
         """"Este método genera los meteoritos medianos al inicio de la partida, les asigna puntuación
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos_m = random.randrange(4, 8)
+        cantidad_meteoritos_m = random.randrange(3, 5)
         for i in range(cantidad_meteoritos_m):
             puntos_m = (i + 20) - i
             meteorito_m = MeteoritoMediano(puntos_m)
