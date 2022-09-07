@@ -2,7 +2,7 @@ import os
 import pygame as pg
 import sqlite3
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, COLOR_TEXTO_INPUT
+from . import ANCHO_P, ALTO_P, COLOR_CAJA_INPUT, COLOR_TEXTO_INPUT
 
 
 class GestorBD:
@@ -67,7 +67,7 @@ class InputBox:
             "resources", "fonts", "game_sans_serif_7.ttf")
         self.tipografia = pg.font.Font(font_file, 20)
         self.texto = ""
-        self.color_fondo = COLOR_TEXTO2
+        self.color_fondo = COLOR_CAJA_INPUT
         self.color_texto = COLOR_TEXTO_INPUT
         self.pantalla = pantalla
         self.padding = 30
@@ -103,13 +103,12 @@ class InputBox:
         self.pantalla.blit(superficie_texto, (pos_x, pos_y))
 
     def pintar_elementos_fijos(self):
-        # el título
+
         self.titulo = self.tipografia.render(
             "¡RECORD! INSERTA TUS INICIALES(3)", True, self.color_texto, self.color_fondo)
         self.x_titulo = (ANCHO_P-self.titulo.get_width())//2
         self.y_titulo = (ALTO_P-self.titulo.get_height())//2
 
-        # el rectángulo de fondo
         x_fondo = self.x_titulo - self.padding
         y_fondo = self.y_titulo - self.padding
         w_fondo = self.titulo.get_width() + self.padding * 2
