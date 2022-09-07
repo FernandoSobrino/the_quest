@@ -10,9 +10,7 @@ class Quest:
         self.display = pg.display.set_mode((ANCHO_P, ALTO_P))
         pg.display.set_caption("THE QUEST")
         pg.mixer.init()
-        self.marcador = Marcador()
-        self.vidas = ContadorVidas(VIDAS)
-
+        
     def jugar(self):
         contador_pantallas = 0
         while contador_pantallas < 4:
