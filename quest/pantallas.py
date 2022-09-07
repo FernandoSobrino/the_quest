@@ -87,6 +87,10 @@ class PantallaPrincipal(Pantalla):
 
 
 class PantallaJuego(Pantalla):
+    marcador = 0
+    vidas = VIDAS
+    #vidas = 500
+
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
 
@@ -109,10 +113,10 @@ class PantallaJuego(Pantalla):
         self.explosiones = pg.sprite.Group()
 
         # creación del contador de vidas
-        self.contador_vidas = ContadorVidas(VIDAS)
+        PantallaJuego.vidas = ContadorVidas(VIDAS)
 
         # creación del marcador de puntos
-        self.marcador = Marcador()
+        PantallaJuego.marcador = Marcador()
 
         # carga del sonido de la explosión
         self.exp_sound = pg.mixer.Sound(os.path.join(
@@ -133,13 +137,16 @@ class PantallaJuego(Pantalla):
 
         while not salir:
             self.reloj.tick(FPS)
+
+            # para medir el tiempo que transcurre durante la partida
+            contador_juego = pg.time.get_ticks()/1000
+
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
             ver problemas de ejecución del juego
             """
             #tiempo_fps = self.reloj.get_fps()
             # print(tiempo_fps)
-
             # Condición para cerrar el juego si pulsamos la X de la ventana
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -161,25 +168,26 @@ class PantallaJuego(Pantalla):
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
 
-            # Condición que activa el flag de aterrizaje
-            if self.marcador.valor >= 100:
+            # Condición que activa el flag de aterrizaje (tiempo transcurrido)
+            print(aterrizaje, contador_juego)
+            if contador_juego >= 45:
                 aterrizaje = True
 
             # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
             if self.jugador.fin_rotacion:
                 self.pintar_fin_nivel()
-                contador = pg.time.get_ticks()/10000
+                contador_finalizacion = pg.time.get_ticks()/10000
                 # print(contador)
                 # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje
-                if contador > TIEMPO_FINALIZACION:
+                if contador_finalizacion > TIEMPO_FINALIZACION:
                     salir = True
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
 
             # Para cerrar el juego si se pierden todas las vidas
-            if self.contador_vidas.vidas == 0:
-                salir = self.contador_vidas.perder_vida()
+            if PantallaJuego.vidas == 0:
+                salir = PantallaJuego.vidas.perder_vida()
                 print("Perdiste todas las vidas")
 
     # -------------MÉTODOS DE FUNCIONAMIENTO FUERA DEL BUCLE PRINCIPAL-----------#
@@ -214,7 +222,7 @@ class PantallaJuego(Pantalla):
                 self.explosiones.add(explosion)
                 self.jugador.esconder_nave()
                 self.exp_sound.play()
-                self.contador_vidas.perder_vida()
+                PantallaJuego.vidas.perder_vida()
 
             for meteorito in self.meteoritos.sprites():
                 if meteorito.rect.right < 0:
@@ -235,7 +243,6 @@ class PantallaJuego(Pantalla):
             self.meteoritos.clear(self.pantalla, self.pantalla)
             self.meteoritos_m.clear(self.pantalla, self.pantalla)
 
-    
     def mover_nave_planeta(self, aterrizar):
         "Este método incluye las maniobras de la nave y el comportamiento del planeta"
         self.jugador.update()
@@ -278,7 +285,7 @@ class PantallaJuego(Pantalla):
         self.explosiones.draw(self.pantalla)
 
         # Para pintar el marcador de vidas
-        self.contador_vidas.pintar_marcador_vidas(self.pantalla)
+        PantallaJuego.vidas.pintar_marcador_vidas(self.pantalla)
 
 
 class PantallaJuego2(PantallaJuego):
@@ -289,9 +296,6 @@ class PantallaJuego2(PantallaJuego):
         imagen_planeta2 = pg.image.load(os.path.join("resources", "images",
                                                      "planeta2.png"))
         self.planeta = Planeta(imagen_planeta2)
-
-        # carga del gestor de la base de datos
-        #self.bd = GestorBD(RUTA)
 
     def bucle_principal(self):
         "Método que controla el juego"
@@ -305,6 +309,9 @@ class PantallaJuego2(PantallaJuego):
         """
         while not salir:
             self.reloj.tick(FPS)
+
+            # para medir el tiempo que transcurre durante la partida
+            contador_juego = pg.time.get_ticks()/1000
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
             ver problemas de ejecución del juego
@@ -333,8 +340,9 @@ class PantallaJuego2(PantallaJuego):
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
 
-            # Condición que activa el flag de aterrizaje
-            if self.marcador.valor >= 200:
+            # Condición que activa el flag de aterrizaje (tiempo transcurrido)
+            print(aterrizaje, contador_juego)
+            if contador_juego >= 120:
                 aterrizaje = True
 
             # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
@@ -356,8 +364,8 @@ class PantallaJuego2(PantallaJuego):
             # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje
 
             # Para cerrar el juego si se pierden todas las vidas
-            if self.contador_vidas.vidas == 0:
-                salir = self.contador_vidas.perder_vida()
+            if PantallaJuego.vidas == 0:
+                salir = PantallaJuego.vidas.perder_vida()
                 print("Perdiste todas las vidas")
 
     # -------------MÉTODOS DE FUNCIONAMIENTO DIFERENTES DEL NIVEL 1 (EN PROGRESO)-----------#
@@ -431,6 +439,8 @@ class PantallaRecords(Pantalla):
 
 
 # -------- MÉTODOS PARA PINTAR LOS ELEMENTOS QUE SE MUESTRAN EN LA PANTALLA --------- #
+
+
     def cargar_datos(self):
         """Este método almacena los elementos a pintar en listas independientes para
         poder renderizarlos después"""
