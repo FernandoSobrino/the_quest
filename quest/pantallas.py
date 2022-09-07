@@ -150,7 +150,7 @@ class PantallaJuego(Pantalla):
             # Condición para cerrar el juego si pulsamos la X de la ventana
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    salir = True
+                    pg.quit()
 
             # Para pintar el fondo del nivel
             self.pintar_fondo()
@@ -322,7 +322,7 @@ class PantallaJuego2(PantallaJuego):
             # Condición para cerrar el juego si pulsamos la X de la ventana
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    salir = True
+                    pg.quit()
 
             # Para pintar el fondo del nivel
             self.pintar_fondo()
@@ -399,6 +399,7 @@ class PantallaRecords(Pantalla):
         font_file = os.path.join("resources", "fonts", "game_sans_serif_7.ttf")
         self.tipografia = pg.font.Font(font_file, 25)
         self.tipo_titulos = pg.font.Font(font_file, 30)
+        self.tipo_reiniciar = pg.font.Font(font_file, 30)
         self.nombres_record = []
         self.nombres_render = []
         self.puntos_record = []
@@ -426,6 +427,8 @@ class PantallaRecords(Pantalla):
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
+                if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                    salir = True
 
             # Para pintar el fondo de estrellas de la pantalla
             self.pintar_fondo()
@@ -439,7 +442,6 @@ class PantallaRecords(Pantalla):
 
 
 # -------- MÉTODOS PARA PINTAR LOS ELEMENTOS QUE SE MUESTRAN EN LA PANTALLA --------- #
-
 
     def cargar_datos(self):
         """Este método almacena los elementos a pintar en listas independientes para
@@ -461,15 +463,13 @@ class PantallaRecords(Pantalla):
 
     def pintar_records(self, nombres, puntos, renderizado, renderizado2):
         "Este método hace el pintado de información (títulos y datos) de los records"
-        borde = 200
-        separacion_x = 200
+        # para pintar los títulos de los records
         pos_x_titulo = 300
         pos_x_titulo2 = 600
         pos_y_titulo = 100
         titulo_nombre = "NOMBRE"
         titulo_puntos = "PUNTOS"
 
-        # para pintar los títulos de los records
         nombres_jugador_render = self.tipo_titulos.render(
             titulo_nombre, True, COLOR_TEXTO2)
         self.pantalla.blit(nombres_jugador_render,
@@ -481,12 +481,25 @@ class PantallaRecords(Pantalla):
                            (pos_x_titulo2, pos_y_titulo))
 
         # para pintar los datos de los records
+        salto_linea = 200
+        separacion_x = 200
+
         for i in range(len(nombres)):
             pos_x = ANCHO_P/3 + renderizado.get_width() - 50
-            pos_y = i * renderizado.get_height() + borde
+            pos_y = i * renderizado.get_height() + salto_linea
             self.pantalla.blit(nombres[i], (pos_x, pos_y))
 
         for j in range(len(puntos)):
             pos_x2 = ANCHO_P/3 + renderizado2.get_width() + separacion_x + 50
-            pos_y2 = j * renderizado.get_height() + borde
+            pos_y2 = j * renderizado.get_height() + salto_linea
             self.pantalla.blit(puntos[j], (pos_x2, pos_y2))
+
+        # para pintar el mensaje de volver a jugar
+        texto_reiniciar = "Pulsa 'ESPACIO' para jugar de nuevo"
+        reiniciar_render = self.tipo_reiniciar.render(
+            texto_reiniciar, True, COLOR_TEXTO2)
+        ancho_texto = reiniciar_render.get_width()
+        pos_x_fin = (ANCHO_P - ancho_texto)/2
+        pos_y_fin = ALTO_P - 75
+        self.pantalla.blit(
+            reiniciar_render, (pos_x_fin, pos_y_fin))
