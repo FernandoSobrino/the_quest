@@ -392,7 +392,7 @@ class PantallaRecords(Pantalla):
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
         self.musica = pg.mixer.music.load(os.path.join(
-            "resources", "sounds", "musica_records_p.mp3"))
+            "resources", "sounds", "musica_records.mp3"))
         self.bd = GestorBD(RUTA)
         self.records = []
         font_file = os.path.join("resources", "fonts", "game_sans_serif_7.ttf")
