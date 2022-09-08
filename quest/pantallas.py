@@ -126,6 +126,7 @@ class PantallaJuego(Pantalla):
         # Flags de salida del juego y de fase de aterrizaje
         salir = False
         aterrizaje = False
+        ticks_juego = pg.time.get_ticks()
         # Reproducción de la música del juego (en bucle)
         pg.mixer.music.play(-1)
 
@@ -133,8 +134,8 @@ class PantallaJuego(Pantalla):
             self.reloj.tick(FPS)
 
             # para medir el tiempo que transcurre durante la partida
-            #contador_juego = pg.time.get_ticks()/1000
-            # print(contador_juego)
+            contador_juego = (pg.time.get_ticks() - ticks_juego)//1000
+            #print(contador_juego)
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
             ver problemas de ejecución del juego
@@ -157,28 +158,27 @@ class PantallaJuego(Pantalla):
 
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave. También desactiva colisiones durante el aterrizaje
-            self.gestionar_meteoritos(aterrizaje)
+            self.comportamiento_meteoritos(aterrizaje)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
 
             # Condición que activa el flag de aterrizaje (PUNTOS OBTENIDOS)
-            """
+
             print(aterrizaje, contador_juego)
-            if contador_juego >= 45:
+            if contador_juego == 45:
                 aterrizaje = True
             """
             if self.marcador.valor > 100:
                 aterrizaje = True
-
+            """
             # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
             if self.jugador.fin_rotacion:
                 self.pintar_fin_nivel("¡NIVEL 1 SUPERADO!")
-                # self.reloj.tick_busy_loop(30)
-                contador_finalizacion = pg.time.get_ticks()/1000
-                print(contador_finalizacion)
+
                 # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje (NI DE COÑA)
                 # if contador_finalizacion > TIEMPO_FINALIZACION:
+            if contador_juego == 60:
                 salir = True
 
             # Actualización de todos los elementos que se están mostrando en la partida
@@ -209,7 +209,7 @@ class PantallaJuego(Pantalla):
             meteorito_m = MeteoritoMediano(puntos_m)
             self.meteoritos_m.add(meteorito_m)
 
-    def gestionar_meteoritos(self, aterrizar):
+    def comportamiento_meteoritos(self, aterrizar):
         if not aterrizar:
             colision = pg.sprite.spritecollide(
                 self.jugador, self.meteoritos, True)
@@ -299,15 +299,16 @@ class PantallaJuego2(PantallaJuego):
         # Flags de salida del juego y de fase de aterrizaje
         salir = False
         aterrizaje = False
-
+        ticks_juego = pg.time.get_ticks()
         # Reproducción de la música del juego (en bucle)
         pg.mixer.music.play(-1)
 
         while not salir:
             self.reloj.tick(FPS)
 
-            # para medir el tiempo que transcurre durante la partida (NO VA)
-            #contador_juego = pg.time.get_ticks()/1000
+            # para medir el tiempo que transcurre durante la partida
+            contador_juego = (pg.time.get_ticks() - ticks_juego)//1000
+            #print(contador_juego)
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
             ver problemas de ejecución del juego
@@ -331,26 +332,22 @@ class PantallaJuego2(PantallaJuego):
 
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave. También desactiva colisiones durante el aterrizaje
-            self.gestionar_meteoritos(aterrizaje)
+            self.comportamiento_meteoritos(aterrizaje)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
 
             # Condición que activa el flag de aterrizaje (PUNTOS OBTENIDOS)
-            """
+            
             print(aterrizaje, contador_juego)
-            if contador_juego >= 120:
-            """
-            if self.marcador.valor > 200:
+            if contador_juego == 120:
                 aterrizaje = True
 
             # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
             if self.jugador.fin_rotacion:
                 self.pintar_fin_nivel("¡ENHORABUENA! HAS GANADO")
-                #contador = pg.time.get_ticks()/10000
-                # print(contador)
-                # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje
-                # if contador > TIEMPO_FINALIZACION:
+
+            if contador_juego == 135:
                 inputbox = InputBox(self.pantalla)
                 pg.mixer.music.fadeout(MUSICA_FADE_OUT)
                 nombre = inputbox.recoger_nombre()
