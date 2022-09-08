@@ -8,8 +8,6 @@ from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS, MARGEN_LATERAL, POS_PLANETA, P
 
 
 class Nave(Sprite):
-    velocidad_mover = 5
-    velocidad_aterrizar = 1
 
     def __init__(self):
         super().__init__()
@@ -19,6 +17,10 @@ class Nave(Sprite):
         self.rect.y = ALTO_P/2
         self.rect.x = MARGEN_LATERAL
         self.angulo = 0
+        self.velocidad_mover = 5
+        self.velocidad_aterrizar = 1
+
+        # Conjunto de flags que controlan el comportamiento de la nave
         self.nave_escondida = False
         self.nave_aterrizando = False
         self.rotacion = False
@@ -56,7 +58,6 @@ class Nave(Sprite):
                 if self.rotacion:
                     self.angulo += 2
                     img_rotada = pg.transform.rotate(self.image, self.angulo)
-                    #rect_rotado = img_rotada.get_rect(center=self.centro_original)
                     rect_rotado = img_rotada.get_rect(center=self.rect.center)
                     pantalla.blit(img_rotada, rect_rotado)
 
@@ -105,7 +106,7 @@ class Meteorito(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = ANCHO_P - self.rect.width
         self.rect.y = random.randrange(ALTO_P-self.rect.height)
-        self.velocidad_x = random.randint(3, 8)
+        self.velocidad_x = random.randint(3, 6)
 
         # Código para almacenar los frames del sprite sheet en una lista
         self.imagenes = []
@@ -159,7 +160,7 @@ class MeteoritoMediano(Meteorito):
         super().__init__(puntuacion)
         self.w = 96
         self.h = 96
-        self.velocidad_x = random.randint(4, 10)
+        self.velocidad_x = random.randint(4, 8)
         self.plantilla_imagenes = pg.image.load(os.path.join(
             "resources", "images", "asteroids_medium.png"))
 
@@ -170,13 +171,13 @@ class MeteoritoMediano(Meteorito):
 
 
 class Planeta(Sprite):
-    velocidad_x = 1
 
     def __init__(self, imagen):
         self.image = imagen
         self.rect = self.image.get_rect()
         self.rect.x = POS_PLANETA
         self.rect.y = (ALTO_P-self.image.get_height())/2
+        self.velocidad_x = 1
 
     def mover_planeta(self, nave_aterrizando):
         if nave_aterrizando:
