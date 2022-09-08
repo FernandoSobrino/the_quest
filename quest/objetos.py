@@ -106,7 +106,7 @@ class Meteorito(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = ANCHO_P - self.rect.width
         self.rect.y = random.randrange(ALTO_P-self.rect.height)
-        self.velocidad_x = random.randint(3, 6)
+        self.velocidad_x = random.randint(3, 5)
 
         # Código para almacenar los frames del sprite sheet en una lista
         self.imagenes = []
@@ -160,7 +160,7 @@ class MeteoritoMediano(Meteorito):
         super().__init__(puntuacion)
         self.w = 96
         self.h = 96
-        self.velocidad_x = random.randint(4, 8)
+        self.velocidad_x = random.randint(4, 6)
         self.plantilla_imagenes = pg.image.load(os.path.join(
             "resources", "images", "asteroids_medium.png"))
 
