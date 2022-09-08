@@ -2,7 +2,7 @@ import os
 import random
 import pygame as pg
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, RUTA, TIEMPO_FINALIZACION, VIDAS
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, MUSICA_FADE_OUT, RUTA
 
 from .objetos import Explosion, Meteorito, MeteoritoMediano, Nave, Planeta
 from .records import GestorBD, InputBox
@@ -88,7 +88,7 @@ class PantallaPrincipal(Pantalla):
 
 class PantallaJuego(Pantalla):
 
-    def __init__(self, pantalla: pg.Surface, vidas, marcador):
+    def __init__(self, pantalla: pg.Surface, marcador):
         super().__init__(pantalla)
 
         # creación de la nave
@@ -108,9 +108,6 @@ class PantallaJuego(Pantalla):
 
         # creación de las explosiones
         self.explosiones = pg.sprite.Group()
-
-        # creación del contador de vidas
-        self.vidas = vidas
 
         # creación del marcador de puntos
         self.marcador = marcador
@@ -137,7 +134,7 @@ class PantallaJuego(Pantalla):
 
             # para medir el tiempo que transcurre durante la partida
             #contador_juego = pg.time.get_ticks()/1000
-
+            # print(contador_juego)
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
             ver problemas de ejecución del juego
@@ -165,7 +162,7 @@ class PantallaJuego(Pantalla):
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
 
-            # Condición que activa el flag de aterrizaje (tiempo transcurrido)
+            # Condición que activa el flag de aterrizaje (PUNTOS OBTENIDOS)
             """
             print(aterrizaje, contador_juego)
             if contador_juego >= 45:
@@ -176,10 +173,11 @@ class PantallaJuego(Pantalla):
 
             # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
             if self.jugador.fin_rotacion:
-                self.pintar_fin_nivel()
-                #contador_finalizacion = pg.time.get_ticks()/10000
-                # print(contador)
-                # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje
+                self.pintar_fin_nivel("¡NIVEL 1 SUPERADO!")
+                # self.reloj.tick_busy_loop(30)
+                contador_finalizacion = pg.time.get_ticks()/1000
+                print(contador_finalizacion)
+                # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje (NI DE COÑA)
                 # if contador_finalizacion > TIEMPO_FINALIZACION:
                 salir = True
 
@@ -187,7 +185,7 @@ class PantallaJuego(Pantalla):
             pg.display.flip()
 
             # Para cerrar el juego si se pierden todas las vidas
-            if self.vidas == 0:
+            if self.marcador.vidas == 0:
                 pg.quit()
                 print("Perdiste todas las vidas")
 
@@ -223,7 +221,7 @@ class PantallaJuego(Pantalla):
                 self.explosiones.add(explosion)
                 self.jugador.esconder_nave()
                 self.exp_sound.play()
-                self.vidas.perder_vida()
+                self.marcador.perder_vida()
 
             for meteorito in self.meteoritos.sprites():
                 if meteorito.rect.right < 0:
@@ -254,12 +252,12 @@ class PantallaJuego(Pantalla):
             self.planeta.mover_planeta(aterrizar)
             self.jugador.aterrizar_nave(aterrizar, self.pantalla)
 
-    def pintar_fin_nivel(self):
+    def pintar_fin_nivel(self, texto):
         "Este método pinta el mensaje que indica el fin del nivel"
         font_file = os.path.join("resources", "fonts",
                                  "light_sans_serif_7.ttf")
         self.tipografia = pg.font.Font(font_file, 50)
-        mensaje = "¡ENHORABUENA! HAS GANADO"
+        mensaje = texto
         texto = self.tipografia.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
@@ -285,13 +283,10 @@ class PantallaJuego(Pantalla):
         self.explosiones.update()
         self.explosiones.draw(self.pantalla)
 
-        # Para pintar el marcador de vidas
-        self.vidas.pintar_marcador_vidas(self.pantalla)
-
 
 class PantallaJuego2(PantallaJuego):
-    def __init__(self, pantalla: pg.Surface, vidas, marcador):
-        super().__init__(pantalla, vidas, marcador)
+    def __init__(self, pantalla: pg.Surface, marcador):
+        super().__init__(pantalla, marcador)
 
         # creación del planeta
         imagen_planeta2 = pg.image.load(os.path.join("resources", "images",
@@ -304,14 +299,14 @@ class PantallaJuego2(PantallaJuego):
         # Flags de salida del juego y de fase de aterrizaje
         salir = False
         aterrizaje = False
-        """
+
         # Reproducción de la música del juego (en bucle)
         pg.mixer.music.play(-1)
-        """
+
         while not salir:
             self.reloj.tick(FPS)
 
-            # para medir el tiempo que transcurre durante la partida
+            # para medir el tiempo que transcurre durante la partida (NO VA)
             #contador_juego = pg.time.get_ticks()/1000
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
@@ -341,7 +336,7 @@ class PantallaJuego2(PantallaJuego):
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
 
-            # Condición que activa el flag de aterrizaje (tiempo transcurrido)
+            # Condición que activa el flag de aterrizaje (PUNTOS OBTENIDOS)
             """
             print(aterrizaje, contador_juego)
             if contador_juego >= 120:
@@ -351,24 +346,24 @@ class PantallaJuego2(PantallaJuego):
 
             # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
             if self.jugador.fin_rotacion:
-                self.pintar_fin_nivel()
+                self.pintar_fin_nivel("¡ENHORABUENA! HAS GANADO")
                 #contador = pg.time.get_ticks()/10000
                 # print(contador)
+                # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje
                 # if contador > TIEMPO_FINALIZACION:
                 inputbox = InputBox(self.pantalla)
+                pg.mixer.music.fadeout(MUSICA_FADE_OUT)
                 nombre = inputbox.recoger_nombre()
                 bd = GestorBD(RUTA)
                 bd.guardarRecords(nombre, self.marcador.valor)
-                #print(nombre, self.marcador.valor)
+                pg.mixer.music.stop()
                 salir = True
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
 
-            # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje
-
             # Para cerrar el juego si se pierden todas las vidas
-            if self.vidas.vidas == 0:
+            if self.marcador.vidas == 0:
                 pg.quit()
                 print("Perdiste todas las vidas")
 
@@ -396,8 +391,8 @@ class PantallaJuego2(PantallaJuego):
 class PantallaRecords(Pantalla):
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
-        # self.musica = pg.mixer.music.load(os.path.join(
-        # "resources", "sounds", "musica_records.mp3"))
+        self.musica = pg.mixer.music.load(os.path.join(
+            "resources", "sounds", "musica_records_p.mp3"))
         self.bd = GestorBD(RUTA)
         self.records = []
         font_file = os.path.join("resources", "fonts", "game_sans_serif_7.ttf")
@@ -413,6 +408,7 @@ class PantallaRecords(Pantalla):
         salir = False
     # Para almacenar los valores de NOMBRE y PUNTOS en listas independientes
     # para poder ser renderizados
+        pg.mixer.music.play(-1)
         self.cargar_datos()
 
     # Renderizado de cada una de las listas de NOMBRE y PUNTOS
@@ -432,6 +428,7 @@ class PantallaRecords(Pantalla):
                 if event.type == pg.QUIT:
                     pg.quit()
                 if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                    pg.mixer.music.stop()
                     salir = True
 
             # Para pintar el fondo de estrellas de la pantalla

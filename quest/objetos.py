@@ -235,8 +235,9 @@ class Explosion(Sprite):
                 self.image = self.imagenes[self.contador]
 
 
-class ContadorVidas:
+class Marcador:
     def __init__(self, vidas_iniciales):
+        self.valor = 0
         self.vidas = vidas_iniciales
         font_file = os.path.join("resources", "fonts",
                                  "sans_serif_plus_7.ttf")
@@ -246,30 +247,28 @@ class ContadorVidas:
         self.vidas -= 1
         return self.vidas < 1
 
-    def pintar_marcador_vidas(self, pantalla):
-        texto_marcador_vidas = f"Vidas: {self.vidas}"
-        texto = self.tipografia.render(
-            str(texto_marcador_vidas), True, COLOR_TEXTO2)
-        pos_x = texto.get_width() - 60
-        pos_y = texto.get_height() + 20
-        pg.surface.Surface.blit(pantalla, texto, (pos_x, pos_y))
-
-
-class Marcador:
-    def __init__(self):
-        self.valor = 0
-        font_file = os.path.join("resources", "fonts", "sans_serif_plus_7.ttf")
-        self.tipografia = pg.font.Font(font_file, 20)
-
     def aumentar(self, puntos):
         self.valor += puntos
 
     def pintar_marcador(self, pantalla):
-        texto_marcador = f"Puntos: {self.valor}"
-        texto = self.tipografia.render(str(texto_marcador), True, COLOR_TEXTO2)
-        pos_x = texto.get_width() - 72
-        pos_y = ALTO_P - texto.get_height() - 30
-        pg.surface.Surface.blit(pantalla, texto, (pos_x, pos_y))
+
+        texto_puntos = f"Puntos: {self.valor}"
+        texto_vidas = f"Vidas: {self.vidas}"
+
+        render_vidas = self.tipografia.render(
+            str(texto_vidas), True, COLOR_TEXTO2)
+        render_marcador = self.tipografia.render(
+            str(texto_puntos), True, COLOR_TEXTO2)
+
+        pos_x_puntos = render_marcador.get_width() - 72
+        pos_y_puntos = ALTO_P - render_marcador.get_height() - 30
+        pg.surface.Surface.blit(pantalla, render_marcador,
+                                (pos_x_puntos, pos_y_puntos))
+
+        pos_x_vidas = render_vidas.get_width() - 60
+        pos_y_vidas = render_vidas.get_height() + 20
+        pg.surface.Surface.blit(pantalla, render_vidas,
+                                (pos_x_vidas, pos_y_vidas))
 
 
 class MeteoritoPequenio(Meteorito):
