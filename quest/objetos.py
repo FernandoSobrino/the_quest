@@ -113,14 +113,16 @@ class Meteorito(Sprite):
         self.contador = 0
         self.tiempo_animacion = FPS // 4
         self.momento_actual = 0
-        self.cargarFrames(self.plantilla_imagenes)
+        self.filas = 4
+        self.columnas = 8
+        self.cargarFrames(self.plantilla_imagenes, self.filas, self.columnas)
 
-    def cargarFrames(self, sprite_sheet):
+    def cargarFrames(self, sprite_sheet, no_fila, no_columna):
         """Esta parte del código recorre el sprite sheet y almacena cada
         fotograma en una lista para preparar la animación"""
-        for fila in range(4):
+        for fila in range(no_fila):
             y = fila * self.h
-            for columna in range(8):
+            for columna in range(no_columna):
                 x = columna * self.w
                 image = pg.Surface((self.w, self.h), pg.SRCALPHA)
                 image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
@@ -167,65 +169,27 @@ class MeteoritoMediano(Meteorito):
         # Para almacenar los frames del sprite sheet del meteorito mediano
         self.imagenes = []
         self.tiempo_animacion = FPS // 3
-        self.cargarFrames(self.plantilla_imagenes)
+        self.cargarFrames(self.plantilla_imagenes, self.filas, self.columnas)
 
 
-class MeteoritoDorado(Sprite):
+class MeteoritoDorado(Meteorito):
+    """Subclase. Sólo conserva aquellos atributos que difieren de la superclase
+    Meteorito"""""
 
     def __init__(self, puntuacion):
-        super().__init__()
-        self.puntos = puntuacion
+        super().__init__(puntuacion)
         self.w = 41.5
         self.h = 50
-        self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+        self.velocidad_x = 7
         self.plantilla_imagenes = pg.image.load(os.path.join(
             "resources", "images", "asteroid_gold.png"))
-        self.rect = self.image.get_rect()
-        self.rect.x = ANCHO_P - self.rect.width
-        self.rect.y = (ALTO_P - self.rect.height)/2
-        self.velocidad_x = 7
-        self.animation_time = FPS // 2
 
-        # Código para almacenar los frames del sprite sheet en una lista
+        # Para almacenar los frames del sprite sheet del meteorito dorado
         self.imagenes = []
-        self.contador = 0
-        self.tiempo_animacion = FPS // 4
-        self.momento_actual = 0
-        self.cargarFrames(self.plantilla_imagenes)
-
-    def cargarFrames(self, sprite_sheet):
-        for fila in range(5):
-            y = fila * self.h
-            for columna in range(6):
-                x = columna * self.w
-                image = pg.Surface((self.w, self.h), pg.SRCALPHA)
-                image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
-                self.imagenes.append(image)
-
-                self.imagenes_cargadas = 0
-                self.imagenes_cargadas = len(self.imagenes)
-                self.image = self.imagenes[self.contador]
-
-    def update(self):
-        # para animar los frames de la imagen del meteorito
-        self.momento_actual += self.tiempo_animacion
-        if self.momento_actual == FPS:
-            self.momento_actual = 0
-            self.contador += 1
-
-            if self.contador >= self.imagenes_cargadas:
-                self.contador = 0
-
-            self.image = self.imagenes[self.contador]
-
-        # controla la velocidad del meteorito
-        self.rect.x -= self.velocidad_x
-
-        # controla que el meteorito no se salga por abajo y por arriba
-        if self.rect.bottom == ALTO_P:
-            self.rect.y = ALTO_P
-        if self.rect.top == 0:
-            self.rect.y += 150
+        self.animation_time = FPS // 2
+        self.filas = 5
+        self.columnas = 6
+        self.cargarFrames(self.plantilla_imagenes, self.filas, self.columnas)
 
 
 class Planeta(Sprite):
