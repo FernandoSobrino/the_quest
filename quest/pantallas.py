@@ -405,7 +405,7 @@ class PantallaJuego2(PantallaJuego):
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
         cantidad_meteoritos = random.randrange(2, 4)
         for i in range(cantidad_meteoritos):
-            puntos = (i + 10) - i
+            puntos = (i + 25) - i
             meteorito = Meteorito(puntos)
             self.meteoritos.add(meteorito)
 
@@ -414,7 +414,7 @@ class PantallaJuego2(PantallaJuego):
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
         cantidad_meteoritos_m = random.randrange(3, 5)
         for i in range(cantidad_meteoritos_m):
-            puntos_m = (i + 20) - i
+            puntos_m = (i + 50) - i
             meteorito_m = MeteoritoMediano(puntos_m)
             self.meteoritos_m.add(meteorito_m)
 
@@ -522,7 +522,7 @@ class PantallaRecords(Pantalla):
             self.pantalla.blit(nombres[i], (pos_x, pos_y))
 
         for j in range(len(puntos)):
-            pos_x2 = ANCHO_P/3 + renderizado2.get_width() + separacion_x + 50
+            pos_x2 = ANCHO_P/3 + renderizado2.get_width() + separacion_x + 25
             pos_y2 = j * renderizado.get_height() + salto_linea
             self.pantalla.blit(puntos[j], (pos_x2, pos_y2))
 
