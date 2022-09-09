@@ -2,9 +2,9 @@ import os
 import random
 import pygame as pg
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, MUSICA_FADE_OUT, RUTA
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, MUSICA_FADE_OUT, PUNTOS_PARTIDA, RUTA
 
-from .objetos import Explosion, Meteorito, MeteoritoMediano, Nave, Planeta
+from .objetos import Explosion, Meteorito, MeteoritoDorado, MeteoritoMediano, Nave, Planeta
 from .records import GestorBD, InputBox
 
 
@@ -101,6 +101,8 @@ class PantallaJuego(Pantalla):
         self.meteoritos_m = pg.sprite.Group()
         self.crear_meteoritos_m()
 
+        self.grupo_dorado = pg.sprite.Group()
+
         # creación del planeta
         imagen_planeta1 = pg.image.load(os.path.join("resources", "images",
                                                      "planeta1.png"))
@@ -113,8 +115,11 @@ class PantallaJuego(Pantalla):
         self.marcador = marcador
 
         # carga del sonido de la explosión
-        self.exp_sound = pg.mixer.Sound(os.path.join(
+        self.sonido_explosion = pg.mixer.Sound(os.path.join(
             "resources", "sounds", "sonido_explosion.wav"))
+
+        self.sonido_meteorito = pg.mixer.Sound(os.path.join(
+            "resources", "sounds", "sonido_meteorito.mp3"))
 
         # carga de la música del juego
         self.musica = pg.mixer.music.load(os.path.join(
@@ -123,10 +128,16 @@ class PantallaJuego(Pantalla):
     def bucle_principal(self):
         "Método que controla el juego"
 
+        # Punto para empezar a contar los ticks del juego
+        ticks_juego = pg.time.get_ticks()
+
         # Flags de salida del juego y de fase de aterrizaje
         salir = False
         aterrizaje = False
-        ticks_juego = pg.time.get_ticks()
+
+        # Flag que controla la salida de un meteorito dorado en la partida
+        meteorito_instanciado = False
+
         # Reproducción de la música del juego (en bucle)
         pg.mixer.music.play(-1)
 
@@ -135,7 +146,7 @@ class PantallaJuego(Pantalla):
 
             # para medir el tiempo que transcurre durante la partida
             contador_juego = (pg.time.get_ticks() - ticks_juego)//1000
-            #print(contador_juego)
+            # print(contador_juego)
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
             ver problemas de ejecución del juego
@@ -163,21 +174,20 @@ class PantallaJuego(Pantalla):
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
 
-            # Condición que activa el flag de aterrizaje (PUNTOS OBTENIDOS)
+            # Condición para que en un momento aleatorio en el rango marcado,
+            # salga un meteorito dorado que otorga 1000 puntos al jugador.
+            if contador_juego == random.randint(20, 40):
+                if not meteorito_instanciado:
+                    self.crear_meteorito_dorado()
+                    meteorito_instanciado = True
 
-            print(aterrizaje, contador_juego)
+            # Condición que activa el flag de aterrizaje (Tiempo transcurrido)
             if contador_juego == 45:
                 aterrizaje = True
-            """
-            if self.marcador.valor > 100:
-                aterrizaje = True
-            """
-            # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
+
+            # Condiciones para realizar la finalización de nivel 1
             if self.jugador.fin_rotacion:
                 self.pintar_fin_nivel("¡NIVEL 1 SUPERADO!")
-
-                # Para cerrar el juego pasados 2.5 segundos tras el aterrizaje (NI DE COÑA)
-                # if contador_finalizacion > TIEMPO_FINALIZACION:
             if contador_juego == 60:
                 salir = True
 
@@ -209,19 +219,28 @@ class PantallaJuego(Pantalla):
             meteorito_m = MeteoritoMediano(puntos_m)
             self.meteoritos_m.add(meteorito_m)
 
+    def crear_meteorito_dorado(self):
+        self.meteo_dorado = MeteoritoDorado(PUNTOS_PARTIDA)
+        self.grupo_dorado.add(self.meteo_dorado)
+
     def comportamiento_meteoritos(self, aterrizar):
         if not aterrizar:
             colision = pg.sprite.spritecollide(
                 self.jugador, self.meteoritos, True)
             colision_m = pg.sprite.spritecollide(
                 self.jugador, self.meteoritos_m, True)
+            colision_dorado = pg.sprite.spritecollide(
+                self.jugador, self.grupo_dorado, True)
 
             if colision or colision_m:
                 explosion = Explosion(self.jugador.rect.center)
                 self.explosiones.add(explosion)
                 self.jugador.esconder_nave()
-                self.exp_sound.play()
+                self.sonido_explosion.play()
                 self.marcador.perder_vida()
+            if colision_dorado:
+                self.marcador.aumentar(1000)
+                self.sonido_meteorito.play()
 
             for meteorito in self.meteoritos.sprites():
                 if meteorito.rect.right < 0:
@@ -279,6 +298,9 @@ class PantallaJuego(Pantalla):
         self.meteoritos_m.update()
         self.meteoritos_m.draw(self.pantalla)
 
+        self.grupo_dorado.update()
+        self.grupo_dorado.draw(self.pantalla)
+
         # Para dibujar y actualizar las explosiones
         self.explosiones.update()
         self.explosiones.draw(self.pantalla)
@@ -296,10 +318,16 @@ class PantallaJuego2(PantallaJuego):
     def bucle_principal(self):
         "Método que controla el juego"
 
+        # Punto para empezar a contar los ticks del juego
+        ticks_juego = pg.time.get_ticks()
+
         # Flags de salida del juego y de fase de aterrizaje
         salir = False
         aterrizaje = False
-        ticks_juego = pg.time.get_ticks()
+
+        # Flag que controla la salida de un meteorito dorado en la partida
+        meteorito_instanciado = False
+
         # Reproducción de la música del juego (en bucle)
         pg.mixer.music.play(-1)
 
@@ -308,7 +336,7 @@ class PantallaJuego2(PantallaJuego):
 
             # para medir el tiempo que transcurre durante la partida
             contador_juego = (pg.time.get_ticks() - ticks_juego)//1000
-            #print(contador_juego)
+            # print(contador_juego)
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
             ver problemas de ejecución del juego
@@ -337,17 +365,23 @@ class PantallaJuego2(PantallaJuego):
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
 
-            # Condición que activa el flag de aterrizaje (PUNTOS OBTENIDOS)
-            
+            # Condición para que en un momento aleatorio en el rango marcado,
+            # salga un meteorito dorado que otorga 1000 puntos al jugador.
+            if contador_juego == random.randint(30, 60):
+                if not meteorito_instanciado:
+                    self.crear_meteorito_dorado()
+                    meteorito_instanciado = True
+
+            # Condición que activa el flag de aterrizaje (Tiempo transcurrido)
             print(aterrizaje, contador_juego)
-            if contador_juego == 120:
+            if contador_juego == 90:
                 aterrizaje = True
 
-            # (POSIBLE) condición para realizar la finalización de nivel (A DESARROLLAR)
+            # Condiciones para realizar la finalización de nivel 2
             if self.jugador.fin_rotacion:
                 self.pintar_fin_nivel("¡ENHORABUENA! HAS GANADO")
 
-            if contador_juego == 135:
+            if contador_juego == 105:
                 inputbox = InputBox(self.pantalla)
                 pg.mixer.music.fadeout(MUSICA_FADE_OUT)
                 nombre = inputbox.recoger_nombre()
