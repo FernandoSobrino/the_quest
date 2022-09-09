@@ -170,8 +170,65 @@ class MeteoritoMediano(Meteorito):
         self.cargarFrames(self.plantilla_imagenes)
 
 
-class Planeta(Sprite):
+class MeteoritoDorado(Sprite):
 
+    def __init__(self, puntuacion):
+        super().__init__()
+        self.puntos = puntuacion
+        self.w = 41.5
+        self.h = 50
+        self.image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+        self.plantilla_imagenes = pg.image.load(os.path.join(
+            "resources", "images", "asteroid_gold.png"))
+        self.rect = self.image.get_rect()
+        self.rect.x = ANCHO_P - self.rect.width
+        self.rect.y = (ALTO_P - self.rect.height)/2
+        self.velocidad_x = 7
+        self.animation_time = FPS // 2
+
+        # Código para almacenar los frames del sprite sheet en una lista
+        self.imagenes = []
+        self.contador = 0
+        self.tiempo_animacion = FPS // 4
+        self.momento_actual = 0
+        self.cargarFrames(self.plantilla_imagenes)
+
+    def cargarFrames(self, sprite_sheet):
+        for fila in range(5):
+            y = fila * self.h
+            for columna in range(6):
+                x = columna * self.w
+                image = pg.Surface((self.w, self.h), pg.SRCALPHA)
+                image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
+                self.imagenes.append(image)
+
+                self.imagenes_cargadas = 0
+                self.imagenes_cargadas = len(self.imagenes)
+                self.image = self.imagenes[self.contador]
+
+    def update(self):
+        # para animar los frames de la imagen del meteorito
+        self.momento_actual += self.tiempo_animacion
+        if self.momento_actual == FPS:
+            self.momento_actual = 0
+            self.contador += 1
+
+            if self.contador >= self.imagenes_cargadas:
+                self.contador = 0
+
+            self.image = self.imagenes[self.contador]
+
+        # controla la velocidad del meteorito
+        self.rect.x -= self.velocidad_x
+
+        # controla que el meteorito no se salga por abajo y por arriba
+        if self.rect.bottom == ALTO_P:
+            self.rect.y = ALTO_P
+        if self.rect.top == 0:
+            self.rect.y += 150
+
+
+class Planeta(Sprite):
     def __init__(self, imagen):
         self.image = imagen
         self.rect = self.image.get_rect()
@@ -217,8 +274,6 @@ class Explosion(Sprite):
                 image = pg.Surface((self.w, self.h), pg.SRCALPHA)
                 image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
                 self.imagenes.append(image)
-
-        self.image = self.imagenes[self.contador]
 
     def update(self):
         """Aquí se ha usado un modo distinto para animar, para probar un nuevo
@@ -270,51 +325,3 @@ class Marcador:
         pos_y_vidas = render_vidas.get_height() + 20
         pg.surface.Surface.blit(pantalla, render_vidas,
                                 (pos_x_vidas, pos_y_vidas))
-
-
-class MeteoritoPequenio(Meteorito):
-    "Clase a construir o eliminar (NO ACTIVA)"
-
-    def __init__(self):
-        super().__init__()
-        self.w = 41.5
-        self.h = 50
-
-        # Cambio del tiempo de animación según la clase padre Meteorito
-        self.animation_time = FPS // 2
-        self.loadFrames()
-
-    def loadFrames(self):
-
-        sprite_sheet = pg.image.load(os.path.join(
-            "resources", "images", "asteroids_usmall.png"))
-
-        for fila in range(5):
-            y = fila * self.h
-            for columna in range(6):
-                x = columna * self.w
-                image = pg.Surface((self.w, self.h), pg.SRCALPHA)
-                image.blit(sprite_sheet, (0, 0), (x, y, self.w, self.h))
-                self.imagenes.append(image)
-
-        self.how_many = len(self.imagenes)
-        self.image = self.imagenes[self.index]
-
-    def update(self):
-        self.current_time += self.animation_time
-        if self.current_time > FPS:
-            self.current_time = 0
-            self.index += 1
-
-            if self.index >= self.how_many:
-                self.index = 0
-
-            self.image = self.imagenes[self.index]
-
-        self.velocidad_x = random.randint(5, 9)
-        self.rect.x -= self.velocidad_x
-
-        if self.rect.bottom == ALTO_P:
-            self.rect.y = ALTO_P - 100
-        if self.rect.top == 0:
-            self.rect.top = 0
