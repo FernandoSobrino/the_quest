@@ -53,11 +53,13 @@ class PantallaPrincipal(Pantalla):
 
     def pintar_texto_instrucciones(self):
 
-        posiciones = [325, 400, 450, 500, 550]
-        mensajes = ["Como jugar:", "- Pulsa ARRIBA/ABAJO para mover la nave.",
-                    "- Esquiva los meteoritos para ganar puntos.", "- Tienes 3 vidas. "
+        posiciones = [275, 350, 400, 450, 500, 550]
+        mensajes = ["Como jugar:", "1. Pulsa ARRIBA/ABAJO para mover la nave.",
+                    "2. Esquiva los meteoritos para ganar puntos.",
+                    "3. Coge el meteorito dorado para ganar puntos.",
+                    "4. Tienes 3 vidas. "
                     "Pierdes vidas si chocas con los meteoritos.",
-                    "- Aguanta el tiempo suficiente para aterrizar en el planeta."]
+                    "5. Aguanta el tiempo suficiente para aterrizar en el planeta."]
 
         pos_x = ANCHO_P - 800
         conta_posiciones = 0
@@ -474,6 +476,7 @@ class PantallaRecords(Pantalla):
 
 
 # -------- MÉTODOS PARA PINTAR LOS ELEMENTOS QUE SE MUESTRAN EN LA PANTALLA --------- #
+
 
     def cargar_datos(self):
         """Este método almacena los elementos a pintar en listas independientes para
