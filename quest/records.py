@@ -38,8 +38,34 @@ class GestorBD:
             records.append(record)
 
         conexion.close()
-
         return records
+
+    def comprobarRecord(self):
+        "Este método comprueba el valor mínimo cuando todos los registros han sido completados"
+        lista_records = []
+        records = self.obtenerRecords()
+        # Se eliminan las claves innecesarias para la comprobación
+        for record in records:
+            record.pop('id')
+            record.pop('nombre')
+            for value in record.values():
+                lista_records.append(value)
+        # Aquí se comprueba si el registro está vacío o está ya completo (TOP 10)
+        if len(lista_records) == 0 or len(lista_records) < 10:
+            pass
+        # Aquí se extrae la puntuación mínima y se devuelve
+        else:
+            valor_minimo = min(lista_records)
+            return valor_minimo
+
+    def actualizarRecord(self, nombre, puntos, puntos_minimos):
+        "Este método actualiza los records si el TOP 10 está lleno"
+        consulta = "UPDATE records SET nombre = (?), puntos = (?)  WHERE puntos = (?)"
+        conexion = sqlite3.connect(self.ruta)
+        cursor = conexion.cursor()
+        cursor.execute(consulta, (nombre, puntos, puntos_minimos))
+        conexion.commit()
+        conexion.close()
 
     def guardarRecords(self, nombre, puntos):
         "Guarda nuevo record en la base de datos"
@@ -90,7 +116,7 @@ class InputBox:
                     self.texto = self.texto[:3]
             self.pintar()
             pg.display.flip()
-        return self.texto
+        return self.texto.upper()
 
     def pintar(self):
         pg.draw.rect(self.pantalla, self.color_fondo, self.fondo)
