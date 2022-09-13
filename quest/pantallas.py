@@ -135,6 +135,7 @@ class PantallaJuego(Pantalla):
 
         # Flags de salida del juego y de fase de aterrizaje
         salir = False
+        game_over = False
         aterrizaje = False
 
         # Flag que controla la salida de un meteorito dorado en la partida
@@ -198,8 +199,26 @@ class PantallaJuego(Pantalla):
 
             # Para cerrar el juego si se pierden todas las vidas
             if self.marcador.vidas == 0:
-                pg.quit()
-                print("Perdiste todas las vidas")
+                game_over = True
+                pg.mixer.music.fadeout(MUSICA_FADE_OUT)
+                bd = GestorBD(RUTA)
+                record_minimo = bd.comprobarRecord()
+                if record_minimo == None:
+                    inputbox = InputBox(self.pantalla)
+                    nombre = inputbox.recoger_nombre()
+                    bd.guardarRecords(nombre, self.marcador.valor)
+                    salir = True
+                elif record_minimo != None and record_minimo < self.marcador.valor:
+                    inputbox = InputBox(self.pantalla)
+                    nombre = inputbox.recoger_nombre()
+                    bd.actualizarRecord(
+                        nombre, self.marcador.valor, record_minimo)
+                    salir = True
+                else:
+                    pg.mixer.music.stop()
+                    salir = True
+
+        return game_over
 
     # -------------MÉTODOS DE FUNCIONAMIENTO FUERA DEL BUCLE PRINCIPAL-----------#
 
@@ -325,6 +344,7 @@ class PantallaJuego2(PantallaJuego):
 
         # Flags de salida del juego y de fase de aterrizaje
         salir = False
+        game_over = False
         aterrizaje = False
 
         # Flag que controla la salida de un meteorito dorado en la partida
@@ -392,7 +412,7 @@ class PantallaJuego2(PantallaJuego):
                     nombre = inputbox.recoger_nombre()
                     bd.guardarRecords(nombre, self.marcador.valor)
                     salir = True
-                if record_minimo != None and record_minimo < self.marcador.valor:
+                elif record_minimo != None and record_minimo < self.marcador.valor:
                     inputbox = InputBox(self.pantalla)
                     nombre = inputbox.recoger_nombre()
                     bd.actualizarRecord(
@@ -407,8 +427,26 @@ class PantallaJuego2(PantallaJuego):
 
             # Para cerrar el juego si se pierden todas las vidas
             if self.marcador.vidas == 0:
-                pg.quit()
-                print("Perdiste todas las vidas")
+                game_over = True
+                pg.mixer.music.fadeout(MUSICA_FADE_OUT)
+                bd = GestorBD(RUTA)
+                record_minimo = bd.comprobarRecord()
+                if record_minimo == None:
+                    inputbox = InputBox(self.pantalla)
+                    nombre = inputbox.recoger_nombre()
+                    bd.guardarRecords(nombre, self.marcador.valor)
+                    salir = True
+                elif record_minimo != None and record_minimo < self.marcador.valor:
+                    inputbox = InputBox(self.pantalla)
+                    nombre = inputbox.recoger_nombre()
+                    bd.actualizarRecord(
+                        nombre, self.marcador.valor, record_minimo)
+                    salir = True
+                else:
+                    pg.mixer.music.stop()
+                    salir = True
+
+        return game_over
 
     # -------------MÉTODOS DE FUNCIONAMIENTO DIFERENTES DEL NIVEL 1 (EN PROGRESO)-----------#
 
