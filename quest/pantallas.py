@@ -384,13 +384,23 @@ class PantallaJuego2(PantallaJuego):
                 self.pintar_fin_nivel("¡ENHORABUENA! HAS GANADO")
 
             if contador_juego == 105:
-                inputbox = InputBox(self.pantalla)
                 pg.mixer.music.fadeout(MUSICA_FADE_OUT)
-                nombre = inputbox.recoger_nombre()
                 bd = GestorBD(RUTA)
-                bd.guardarRecords(nombre, self.marcador.valor)
-                pg.mixer.music.stop()
-                salir = True
+                record_minimo = bd.comprobarRecord()
+                if record_minimo == None:
+                    inputbox = InputBox(self.pantalla)
+                    nombre = inputbox.recoger_nombre()
+                    bd.guardarRecords(nombre, self.marcador.valor)
+                    salir = True
+                if record_minimo != None and record_minimo < self.marcador.valor:
+                    inputbox = InputBox(self.pantalla)
+                    nombre = inputbox.recoger_nombre()
+                    bd.actualizarRecord(
+                        nombre, self.marcador.valor, record_minimo)
+                    salir = True
+                else:
+                    pg.mixer.music.stop()
+                    salir = True
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
@@ -414,7 +424,7 @@ class PantallaJuego2(PantallaJuego):
     def crear_meteoritos_m(self):
         """"Este método genera los meteoritos medianos al inicio de la partida, les asigna puntuación
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos_m = random.randrange(3, 5)
+        cantidad_meteoritos_m = random.randrange(3, 4)
         for i in range(cantidad_meteoritos_m):
             puntos_m = (i + 50) - i
             meteorito_m = MeteoritoMediano(puntos_m)
