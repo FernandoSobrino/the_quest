@@ -35,7 +35,6 @@ class PantallaPrincipal(Pantalla):
         while not salir:
             for event in pg.event.get():
                 if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                    # pg.mixer.music.stop()
                     salir = True
                 if event.type == pg.QUIT:
                     pg.quit()
@@ -72,7 +71,7 @@ class PantallaPrincipal(Pantalla):
             conta_posiciones += 1
 
     def pintar_texto_partida(self):
-        mensaje = "Pulsa 'ESPACIO' para comenzar la partida"
+        mensaje = 'Pulsa "ESPACIO" para comenzar la partida'
         texto = self.tipo_juego.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
@@ -157,6 +156,8 @@ class PantallaJuego(Pantalla):
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
+                if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                    salir = True
 
             # Para pintar el fondo del nivel
             self.pintar_fondo()
@@ -189,8 +190,7 @@ class PantallaJuego(Pantalla):
             # Condiciones para realizar la finalización de nivel 1
             if self.jugador.fin_rotacion:
                 self.pintar_fin_nivel("¡NIVEL 1 SUPERADO!")
-            if contador_juego == 60:
-                salir = True
+                self.pintar_nivel_2()
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
@@ -306,6 +306,18 @@ class PantallaJuego(Pantalla):
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
         pos_y = texto.get_height()*3
+        self.pantalla.blit(texto, (pos_x, pos_y))
+
+    def pintar_nivel_2(self):
+        "Método que pinta el mensaje de continuar al nivel 2"
+        font_file = os.path.join("resources", "fonts",
+                                 "light_sans_serif_7.ttf")
+        self.tipografia = pg.font.Font(font_file, 50)
+        mensaje = 'Pulsa "ESPACIO" para ir al nivel 2'
+        texto = self.tipografia.render(mensaje, True, COLOR_TEXTO2)
+        ancho_texto = texto.get_width()
+        pos_x = (ANCHO_P - ancho_texto)/2
+        pos_y = (ALTO_P - texto.get_height()) - 100
         self.pantalla.blit(texto, (pos_x, pos_y))
 
     def pintar_fondo(self):
@@ -482,7 +494,6 @@ class PantallaRecords(Pantalla):
 
 # -------- MÉTODOS PARA PINTAR LOS ELEMENTOS QUE SE MUESTRAN EN LA PANTALLA --------- #
 
-
     def cargar_datos(self):
         """Este método almacena los elementos a pintar en listas independientes para
         poder renderizarlos después"""
@@ -535,7 +546,7 @@ class PantallaRecords(Pantalla):
             self.pantalla.blit(puntos[j], (pos_x2, pos_y2))
 
         # para pintar el mensaje de volver a jugar
-        texto_reiniciar = "Pulsa 'ESPACIO' para jugar de nuevo"
+        texto_reiniciar = 'Pulsa "ESPACIO" para jugar de nuevo'
         reiniciar_render = self.tipo_reiniciar.render(
             texto_reiniciar, True, COLOR_TEXTO2)
         ancho_texto = reiniciar_render.get_width()
