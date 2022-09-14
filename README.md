@@ -61,7 +61,7 @@ pip install -r requirements.txt
 
 4. Arrancar el juego
 
-### ejecuta el módulo principal para jugar:
+### Ejecuta el módulo principal para jugar:
 ````
 python main.py
 ````
