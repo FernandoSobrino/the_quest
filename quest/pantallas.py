@@ -149,7 +149,7 @@ class PantallaJuego(Pantalla):
 
             # para medir el tiempo que transcurre durante la partida
             contador_juego = (pg.time.get_ticks() - ticks_juego)//1000
-            # print(contador_juego)
+
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
             ver problemas de ejecución del juego
@@ -200,23 +200,8 @@ class PantallaJuego(Pantalla):
             # Para cerrar el juego si se pierden todas las vidas
             if self.marcador.vidas == 0:
                 game_over = True
-                pg.mixer.music.fadeout(MUSICA_FADE_OUT)
-                bd = GestorBD(RUTA)
-                record_minimo = bd.comprobarRecord()
-                if record_minimo == None:
-                    inputbox = InputBox(self.pantalla)
-                    nombre = inputbox.recoger_nombre()
-                    bd.guardarRecords(nombre, self.marcador.valor)
-                    salir = True
-                elif record_minimo != None and record_minimo < self.marcador.valor:
-                    inputbox = InputBox(self.pantalla)
-                    nombre = inputbox.recoger_nombre()
-                    bd.actualizarRecord(
-                        nombre, self.marcador.valor, record_minimo)
-                    salir = True
-                else:
-                    pg.mixer.music.stop()
-                    salir = True
+                self.lanzarRecord(salir)
+                salir = True
 
         return game_over
 
@@ -281,6 +266,25 @@ class PantallaJuego(Pantalla):
         else:
             self.meteoritos.clear(self.pantalla, self.pantalla)
             self.meteoritos_m.clear(self.pantalla, self.pantalla)
+
+    def lanzarRecord(self, fin):
+        "Este método controla las condiciones para lanzar la recogida de record"
+        pg.mixer.music.fadeout(MUSICA_FADE_OUT)
+        bd = GestorBD(RUTA)
+        record_minimo = bd.comprobarRecord()
+        if not fin:
+            if record_minimo == None:
+                inputbox = InputBox(self.pantalla)
+                nombre = inputbox.recoger_nombre()
+                bd.guardarRecords(nombre, self.marcador.valor)
+            elif record_minimo != None and record_minimo < self.marcador.valor:
+                inputbox = InputBox(self.pantalla)
+                nombre = inputbox.recoger_nombre()
+                bd.actualizarRecord(
+                    nombre, self.marcador.valor, record_minimo)
+        else:
+            pg.mixer.music.stop()
+            fin = True
 
     def mover_nave_planeta(self, aterrizar):
         "Este método incluye las maniobras de la nave y el comportamiento del planeta"
@@ -358,7 +362,6 @@ class PantallaJuego2(PantallaJuego):
 
             # para medir el tiempo que transcurre durante la partida
             contador_juego = (pg.time.get_ticks() - ticks_juego)//1000
-            # print(contador_juego)
             """
             Parte comentada para pruebas: activa, mide los FPS por seg. para
             ver problemas de ejecución del juego
@@ -395,7 +398,6 @@ class PantallaJuego2(PantallaJuego):
                     meteorito_instanciado = True
 
             # Condición que activa el flag de aterrizaje (Tiempo transcurrido)
-            print(aterrizaje, contador_juego)
             if contador_juego == 90:
                 aterrizaje = True
 
@@ -404,23 +406,8 @@ class PantallaJuego2(PantallaJuego):
                 self.pintar_fin_nivel("¡ENHORABUENA! HAS GANADO")
 
             if contador_juego == 105:
-                pg.mixer.music.fadeout(MUSICA_FADE_OUT)
-                bd = GestorBD(RUTA)
-                record_minimo = bd.comprobarRecord()
-                if record_minimo == None:
-                    inputbox = InputBox(self.pantalla)
-                    nombre = inputbox.recoger_nombre()
-                    bd.guardarRecords(nombre, self.marcador.valor)
-                    salir = True
-                elif record_minimo != None and record_minimo < self.marcador.valor:
-                    inputbox = InputBox(self.pantalla)
-                    nombre = inputbox.recoger_nombre()
-                    bd.actualizarRecord(
-                        nombre, self.marcador.valor, record_minimo)
-                    salir = True
-                else:
-                    pg.mixer.music.stop()
-                    salir = True
+                self.lanzarRecord(salir)
+                salir = True
 
             # Actualización de todos los elementos que se están mostrando en la partida
             pg.display.flip()
@@ -428,23 +415,8 @@ class PantallaJuego2(PantallaJuego):
             # Para cerrar el juego si se pierden todas las vidas
             if self.marcador.vidas == 0:
                 game_over = True
-                pg.mixer.music.fadeout(MUSICA_FADE_OUT)
-                bd = GestorBD(RUTA)
-                record_minimo = bd.comprobarRecord()
-                if record_minimo == None:
-                    inputbox = InputBox(self.pantalla)
-                    nombre = inputbox.recoger_nombre()
-                    bd.guardarRecords(nombre, self.marcador.valor)
-                    salir = True
-                elif record_minimo != None and record_minimo < self.marcador.valor:
-                    inputbox = InputBox(self.pantalla)
-                    nombre = inputbox.recoger_nombre()
-                    bd.actualizarRecord(
-                        nombre, self.marcador.valor, record_minimo)
-                    salir = True
-                else:
-                    pg.mixer.music.stop()
-                    salir = True
+                self.lanzarRecord(salir)
+                salir = True
 
         return game_over
 
