@@ -199,7 +199,7 @@ class PantallaJuego(Pantalla):
             if self.marcador.vidas == 0:
                 self.pintar_fin_nivel("HAS PERDIDO :(")
                 game_over = True
-                self.lanzarRecord(salir)
+                self.lanzarRecord()
                 salir = True
 
         return game_over
@@ -269,25 +269,21 @@ class PantallaJuego(Pantalla):
             self.meteoritos.clear(self.pantalla, self.pantalla)
             self.meteoritos_m.clear(self.pantalla, self.pantalla)
 
-    def lanzarRecord(self, fin):
+    def lanzarRecord(self):
         "Método que controla las condiciones para lanzar la recogida de record"
         pg.mixer.music.fadeout(MUSICA_FADE_OUT)
         bd = GestorBD(RUTA)
         record_minimo = bd.comprobarRecord()
-        if not fin:
-            if record_minimo == None and self.marcador.valor != 0:
+        if record_minimo == None and self.marcador.valor != 0:
+            inputbox = InputBox(self.pantalla)
+            nombre = inputbox.recoger_nombre()
+            bd.guardarRecords(nombre, self.marcador.valor)
+        if record_minimo != None and record_minimo < self.marcador.valor:
+            if self.marcador.valor != 0:
                 inputbox = InputBox(self.pantalla)
                 nombre = inputbox.recoger_nombre()
-                bd.guardarRecords(nombre, self.marcador.valor)
-            elif record_minimo != None and record_minimo < self.marcador.valor:
-                if self.marcador.valor != 0:
-                    inputbox = InputBox(self.pantalla)
-                    nombre = inputbox.recoger_nombre()
-                    bd.actualizarRecord(
-                        nombre, self.marcador.valor, record_minimo)
-        else:
-            pg.mixer.music.stop()
-            fin = True
+                bd.actualizarRecord(
+                    nombre, self.marcador.valor, record_minimo)
 
     def mover_nave_planeta(self, aterrizar):
         "Método que incluye las maniobras de la nave y el comportamiento del planeta"
@@ -425,7 +421,7 @@ class PantallaJuego2(PantallaJuego):
                 self.pintar_fin_nivel("¡ENHORABUENA! HAS GANADO")
 
             if contador_juego == 110:
-                self.lanzarRecord(salir)
+                self.lanzarRecord()
                 salir = True
 
             # Actualización de todos los elementos que se están mostrando en la partida
@@ -435,7 +431,7 @@ class PantallaJuego2(PantallaJuego):
             if self.marcador.vidas == 0:
                 self.pintar_fin_nivel("HAS PERDIDO :(")
                 game_over = True
-                self.lanzarRecord(salir)
+                self.lanzarRecord()
                 salir = True
 
         return game_over
@@ -521,7 +517,7 @@ class PantallaRecords(Pantalla):
         "Este método hace el pintado de información (títulos y datos) de los records"
         # para pintar los títulos de los records
         pos_x_titulo = 300
-        pos_x_titulo2 = 600
+        pos_x_titulo2 = 560
         pos_y_titulo = 100
         titulo_nombre = "NOMBRE"
         titulo_puntos = "PUNTOS"
