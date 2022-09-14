@@ -197,6 +197,7 @@ class PantallaJuego(Pantalla):
 
             # Para cerrar el juego si se pierden todas las vidas
             if self.marcador.vidas == 0:
+                self.pintar_fin_nivel("HAS PERDIDO :(")
                 game_over = True
                 self.lanzarRecord(salir)
                 salir = True
@@ -274,15 +275,16 @@ class PantallaJuego(Pantalla):
         bd = GestorBD(RUTA)
         record_minimo = bd.comprobarRecord()
         if not fin:
-            if record_minimo == None:
+            if record_minimo == None and self.marcador.valor != 0:
                 inputbox = InputBox(self.pantalla)
                 nombre = inputbox.recoger_nombre()
                 bd.guardarRecords(nombre, self.marcador.valor)
             elif record_minimo != None and record_minimo < self.marcador.valor:
-                inputbox = InputBox(self.pantalla)
-                nombre = inputbox.recoger_nombre()
-                bd.actualizarRecord(
-                    nombre, self.marcador.valor, record_minimo)
+                if self.marcador.valor != 0:
+                    inputbox = InputBox(self.pantalla)
+                    nombre = inputbox.recoger_nombre()
+                    bd.actualizarRecord(
+                        nombre, self.marcador.valor, record_minimo)
         else:
             pg.mixer.music.stop()
             fin = True
@@ -431,6 +433,7 @@ class PantallaJuego2(PantallaJuego):
 
             # Para cerrar el juego si se pierden todas las vidas
             if self.marcador.vidas == 0:
+                self.pintar_fin_nivel("HAS PERDIDO :(")
                 game_over = True
                 self.lanzarRecord(salir)
                 salir = True
