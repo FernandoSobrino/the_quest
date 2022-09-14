@@ -267,7 +267,10 @@ class Marcador:
         self.vidas -= 1
         return self.vidas < 1
 
-    def aumentar(self, puntos):
+    def sumar_vida(self):
+        self.vidas += 1
+
+    def aumentar_puntos(self, puntos):
         self.valor += puntos
 
     def pintar_marcador(self, pantalla):
