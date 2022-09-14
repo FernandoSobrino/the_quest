@@ -2,7 +2,7 @@ import os
 import random
 import pygame as pg
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, METEORITOS_M_NIVEL_1, METEORITOS_M_NIVEL_2, METEORITOS_NIVEL_1, METEORITOS_NIVEL_2, MUSICA_FADE_OUT, PUNTOS_PARTIDA, RUTA
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, METEORITOS_M_NIVEL_1, METEORITOS_M_NIVEL_2, METEORITOS_NIVEL_1, METEORITOS_NIVEL_2, MUSICA_FADE_OUT, PUNTOS_1, PUNTOS_2, PUNTOS_M_1, PUNTOS_M_2, PUNTOS_PARTIDA, RUTA
 
 from .objetos import Explosion, Meteorito, MeteoritoDorado, MeteoritoMediano, Nave, Planeta
 from .records import GestorBD, InputBox
@@ -55,7 +55,7 @@ class PantallaPrincipal(Pantalla):
         posiciones = [275, 350, 400, 450, 500, 550]
         mensajes = ["Como jugar:", "1. Pulsa ARRIBA/ABAJO para mover la nave.",
                     "2. Esquiva los meteoritos para ganar puntos.",
-                    "3. Coge el meteorito dorado para ganar puntos.",
+                    "3. Coge el meteorito dorado para una recompensa.",
                     "4. Tienes 3 vidas. "
                     "Pierdes vidas si chocas con los meteoritos.",
                     "5. Aguanta el tiempo suficiente para aterrizar en el planeta."]
@@ -97,10 +97,10 @@ class PantallaJuego(Pantalla):
 
         # creación de los meteoritos
         self.meteoritos = pg.sprite.Group()
-        self.crear_meteoritos(METEORITOS_NIVEL_1)
+        self.crear_meteoritos(METEORITOS_NIVEL_1, PUNTOS_1)
 
         self.meteoritos_m = pg.sprite.Group()
-        self.crear_meteoritos_m(METEORITOS_M_NIVEL_1)
+        self.crear_meteoritos_m(METEORITOS_M_NIVEL_1, PUNTOS_M_1)
 
         self.grupo_dorado = pg.sprite.Group()
 
@@ -171,7 +171,7 @@ class PantallaJuego(Pantalla):
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave. También desactiva colisiones durante el aterrizaje
             self.comportamiento_meteoritos(aterrizaje,
-                                           METEORITOS_NIVEL_1, METEORITOS_M_NIVEL_1)
+                                           METEORITOS_NIVEL_1, PUNTOS_1, METEORITOS_M_NIVEL_1, PUNTOS_M_1)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
@@ -205,21 +205,21 @@ class PantallaJuego(Pantalla):
 
     # -------------MÉTODOS DE FUNCIONAMIENTO PERTENECIENTES A LA PARTIDA-----------#
 
-    def crear_meteoritos(self, numero):
+    def crear_meteoritos(self, numero, no_puntos):
         """"Método que genera los meteoritos grandes al inicio de la partida, les asigna puntuación y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
         cantidad_meteoritos = random.randrange(numero)
         for i in range(cantidad_meteoritos):
-            puntos = (i + 10) - i
+            puntos = (i + no_puntos) - i
             meteorito = Meteorito(puntos)
             self.meteoritos.add(meteorito)
 
-    def crear_meteoritos_m(self, numero):
+    def crear_meteoritos_m(self, numero, no_puntos):
         """"Método que genera los meteoritos medianos al inicio de la partida, les asigna puntuación
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
         cantidad_meteoritos_m = random.randrange(numero)
         for i in range(cantidad_meteoritos_m):
-            puntos_m = (i + 20) - i
+            puntos_m = (i + no_puntos) - i
             meteorito_m = MeteoritoMediano(puntos_m)
             self.meteoritos_m.add(meteorito_m)
 
@@ -228,7 +228,7 @@ class PantallaJuego(Pantalla):
         self.meteo_dorado = MeteoritoDorado(PUNTOS_PARTIDA)
         self.grupo_dorado.add(self.meteo_dorado)
 
-    def comportamiento_meteoritos(self, aterrizar, numero, numero_m):
+    def comportamiento_meteoritos(self, aterrizar, numero, puntos, numero_m, puntos_m):
         "Método que controla el comportamiento de los meteoritos de la partida"
         if not aterrizar:
             colision = pg.sprite.spritecollide(
@@ -245,24 +245,25 @@ class PantallaJuego(Pantalla):
                 self.sonido_explosion.play()
                 self.marcador.perder_vida()
             if colision_dorado:
-                self.marcador.aumentar(1000)
+                self.marcador.aumentar_puntos(1000)
+                self.marcador.sumar_vida()
                 self.sonido_meteorito.play()
 
             for meteorito in self.meteoritos.sprites():
                 if meteorito.rect.right < 0:
                     if not self.jugador.nave_escondida:
-                        self.marcador.aumentar(meteorito.puntos)
+                        self.marcador.aumentar_puntos(meteorito.puntos)
                     self.meteoritos.remove(meteorito)
             if len(self.meteoritos.sprites()) < 1:
-                self.crear_meteoritos(numero)
+                self.crear_meteoritos(numero, puntos)
 
             for meteorito_m in self.meteoritos_m.sprites():
                 if meteorito_m.rect.right < 0:
                     if not self.jugador.nave_escondida:
-                        self.marcador.aumentar(meteorito_m.puntos)
+                        self.marcador.aumentar_puntos(meteorito_m.puntos)
                     self.meteoritos_m.remove(meteorito_m)
             if len(self.meteoritos_m.sprites()) < 1:
-                self.crear_meteoritos_m(numero_m)
+                self.crear_meteoritos_m(numero_m, puntos_m)
         else:
             self.meteoritos.clear(self.pantalla, self.pantalla)
             self.meteoritos_m.clear(self.pantalla, self.pantalla)
@@ -349,10 +350,10 @@ class PantallaJuego2(PantallaJuego):
 
         # creación de los meteoritos
         self.meteoritos = pg.sprite.Group()
-        self.crear_meteoritos(METEORITOS_NIVEL_2)
+        self.crear_meteoritos(METEORITOS_NIVEL_2, PUNTOS_2)
 
         self.meteoritos_m = pg.sprite.Group()
-        self.crear_meteoritos_m(METEORITOS_M_NIVEL_2)
+        self.crear_meteoritos_m(METEORITOS_M_NIVEL_2, PUNTOS_M_2)
 
         # creación del planeta
         imagen_planeta2 = pg.image.load(os.path.join("resources", "images",
@@ -401,7 +402,7 @@ class PantallaJuego2(PantallaJuego):
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave. También desactiva colisiones durante el aterrizaje
             self.comportamiento_meteoritos(aterrizaje,
-                                           METEORITOS_NIVEL_2, METEORITOS_M_NIVEL_2)
+                                           METEORITOS_NIVEL_2, PUNTOS_2, METEORITOS_M_NIVEL_2, PUNTOS_M_2)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
@@ -493,6 +494,7 @@ class PantallaRecords(Pantalla):
 
 
 # -------- MÉTODOS PARA PINTAR LOS ELEMENTOS QUE SE MUESTRAN EN LA PANTALLA --------- #
+
 
     def cargar_datos(self):
         """Este método almacena los elementos a pintar en listas independientes para
