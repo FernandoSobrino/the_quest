@@ -27,8 +27,8 @@ class Quest:
             if contador_pantallas == 3:
                 pantalla_activa = PantallaRecords(self.display)
 
-            en_juego = pantalla_activa.bucle_principal()
-            if en_juego == True:
+            fin_juego = pantalla_activa.bucle_principal()
+            if fin_juego == True:
                 contador_pantallas = 3
             else:
                 contador_pantallas += 1
