@@ -4,12 +4,12 @@ Juego realizado en lenguaje Python con la librería Pygame.
 
 
 
-# Historia de The Quest
-Año 2045. El planeta Tierra ha sido devastado por una fuerte tormenta solar.
-Los únicos supervivientes han tomado rumbo en un transbordador espacial, en búsqueda 
+# Historia de "The Quest"
+Año 2045. La Tierra ha sido devastada por una fuerte tormenta solar.
+Los únicos supervivientes viajan en una nave espacial, en búsqueda 
 de un nuevo planeta habitable. 
 
-Lleva a los supervivientes esquivando los peligros del espacio y consigue liberar a la raza humana de la extinción inminente.
+Esquiva los peligros del espacio y consigue liberar a la raza humana de la extinción inminente.
 
 
 ## Para jugar
@@ -17,11 +17,11 @@ Lleva a los supervivientes esquivando los peligros del espacio y consigue libera
 1. Clonar el repositorio
 
 
-### con ssh:
+### Con ssh:
 ````
 git clone ssh:// (lo que sigue)
 ````
-### con https:
+### Con https:
 ````
 git clone https:// (lo que sigue)
 ````
@@ -44,12 +44,12 @@ python -m venv nombre_del_entorno
 
 ## Para activar el entorno virtual:
 
-### en Windows:
+### En Windows:
 ````
 .\env\Scripts\activate
 ````
 
-### en Mac, Linux:
+### En Mac, Linux:
 ````
 source ./env/bin/activate
 ````
