@@ -6,6 +6,7 @@ from . import ANCHO_P, ALTO_P, COLOR_CAJA_INPUT, COLOR_TEXTO_INPUT
 
 
 class GestorBD:
+    "Clase que gestiona la base de datos"
     def __init__(self, ruta):
         self.ruta = ruta
 
@@ -77,7 +78,7 @@ class GestorBD:
         conexion.close()
 
     def eliminarRecords(self):
-        "Método para pruebas. Manejar con cuidado. Elimina todos los datos"
+        "Método para pruebas. Manejar con cuidado. Elimina todos los records"
         consulta = "DELETE FROM records"
         conexion = sqlite3.connect(self.ruta)
         cursor = conexion.cursor()
@@ -87,7 +88,7 @@ class GestorBD:
 
 
 class InputBox:
-
+    "Clase que dispone una entrada de texto en la pantalla de juego"
     def __init__(self, pantalla: pg.Surface):
         font_file = os.path.join(
             "resources", "fonts", "game_sans_serif_7.ttf")
@@ -96,7 +97,7 @@ class InputBox:
         self.color_fondo = COLOR_CAJA_INPUT
         self.color_texto = COLOR_TEXTO_INPUT
         self.pantalla = pantalla
-        self.padding = 30
+        self.espacio = 30
         self.pintar_elementos_fijos()
 
     def recoger_nombre(self):
@@ -135,8 +136,8 @@ class InputBox:
         self.x_titulo = (ANCHO_P-self.titulo.get_width())//2
         self.y_titulo = (ALTO_P-self.titulo.get_height())//2
 
-        x_fondo = self.x_titulo - self.padding
-        y_fondo = self.y_titulo - self.padding
-        w_fondo = self.titulo.get_width() + self.padding * 2
-        h_fondo = self.titulo.get_height() * 2 + self.padding * 2
+        x_fondo = self.x_titulo - self.espacio
+        y_fondo = self.y_titulo - self.espacio
+        w_fondo = self.titulo.get_width() + self.espacio * 2
+        h_fondo = self.titulo.get_height() * 2 + self.espacio * 2
         self.fondo = pg.Rect(x_fondo, y_fondo, w_fondo, h_fondo)

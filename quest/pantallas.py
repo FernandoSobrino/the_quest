@@ -9,6 +9,7 @@ from .records import GestorBD, InputBox
 
 
 class Pantalla:
+    "Clase base de la pantalla de la que heredan el resto"
     def __init__(self, pantalla: pg.Surface):
 
         self.pantalla = pantalla
@@ -19,6 +20,7 @@ class Pantalla:
 
 
 class PantallaPrincipal(Pantalla):
+    "Clase que controla la pantalla principal"
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
 
@@ -26,8 +28,8 @@ class PantallaPrincipal(Pantalla):
                                  "light_sans_serif_7.ttf")
         font_file2 = os.path.join("resources", "fonts",
                                   "game_sans_serif_7.ttf")
-        self.tipografia = pg.font.Font(font_file, 100)
-        self.tipo_juego = pg.font.Font(font_file2, 30)
+        self.tipo_titulo = pg.font.Font(font_file, 100)
+        self.tipo_historia = pg.font.Font(font_file2, 30)
         self.tipo_info = pg.font.Font(font_file2, 20)
 
     def bucle_principal(self):
@@ -49,6 +51,14 @@ class PantallaPrincipal(Pantalla):
             "resources", "images", "fondo_intro.jpg"))
         self.pantalla.blit(self.fondo, (0, 0))
 
+    def pintar_texto_historia(self):
+        mensaje = 'Pulsa "H" para conocer la historia del juego'
+        texto = self.tipo_historia.render(mensaje, True, COLOR_TEXTO2)
+        ancho_texto = texto.get_width()
+        pos_x = (ANCHO_P - ancho_texto)/2
+        pos_y = ALTO_P - 75
+        self.pantalla.blit(texto, (pos_x, pos_y))
+    
     def pintar_texto_instrucciones(self):
 
         posiciones = [275, 350, 400, 450, 500, 550]
@@ -69,14 +79,6 @@ class PantallaPrincipal(Pantalla):
                 texto_render, (pos_x, posiciones[conta_posiciones]))
             conta_posiciones += 1
 
-    def pintar_texto_historia(self):
-        mensaje = 'Pulsa "H" para conocer la historia del juego'
-        texto = self.tipo_juego.render(mensaje, True, COLOR_TEXTO2)
-        ancho_texto = texto.get_width()
-        pos_x = (ANCHO_P - ancho_texto)/2
-        pos_y = ALTO_P - 75
-        self.pantalla.blit(texto, (pos_x, pos_y))
-
     def pintar_texto_titulo(self):
         mensaje = "THE QUEST"
         texto = self.tipografia.render(mensaje, True, COLOR_TEXTO2)
@@ -87,6 +89,7 @@ class PantallaPrincipal(Pantalla):
 
     
 class PantallaHistoria(Pantalla):
+    "Clase que controla la pantalla de la historia del juego"
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
 
@@ -94,7 +97,7 @@ class PantallaHistoria(Pantalla):
                                  "light_sans_serif_7.ttf")
         font_file2 = os.path.join("resources", "fonts",
                                   "game_sans_serif_7.ttf")
-        self.tipografia = pg.font.Font(font_file, 75)
+        self.tipo_titulo = pg.font.Font(font_file, 75)
         self.tipo_juego = pg.font.Font(font_file2, 30)
         self.tipo_info = pg.font.Font(font_file2, 25)
 
@@ -120,7 +123,7 @@ class PantallaHistoria(Pantalla):
     def pintar_texto_historia(self):
         #Pinta el texto del año
         anio = "2045"
-        texto = self.tipografia.render(anio, True, COLOR_TEXTO2)
+        texto = self.tipo_titulo.render(anio, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto - 30)/2
         pos_y = ALTO_P/6
@@ -154,7 +157,7 @@ class PantallaHistoria(Pantalla):
         
 
 class PantallaJuego(Pantalla):
-
+    "Clase que controla el primer nivel del juego"
     def __init__(self, pantalla: pg.Surface, marcador):
         super().__init__(pantalla)
 
@@ -410,6 +413,7 @@ class PantallaJuego(Pantalla):
 
 
 class PantallaJuego2(PantallaJuego):
+    "Clase que controla el segundo nivel del juego"
     def __init__(self, pantalla: pg.Surface, marcador):
         super().__init__(pantalla, marcador)
 
@@ -505,6 +509,7 @@ class PantallaJuego2(PantallaJuego):
 
 
 class PantallaRecords(Pantalla):
+    "Clase que controla la pantalla de records del juego"
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
         self.musica = pg.mixer.music.load(os.path.join(

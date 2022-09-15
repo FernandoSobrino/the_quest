@@ -6,7 +6,6 @@ from pygame.sprite import Sprite
 
 from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS, MARGEN_LATERAL, POS_PLANETA, PUNTOS_PARTIDA
 
-
 class Nave(Sprite):
     "Clase que construye el objeto nave"
     def __init__(self):
@@ -152,7 +151,7 @@ class Meteorito(Sprite):
         if self.rect.bottom == ALTO_P:
             self.rect.y = ALTO_P
         if self.rect.top == 0:
-            self.rect.y += 150
+            self.rect.y = 150
 
 
 class MeteoritoMediano(Meteorito):
