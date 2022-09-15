@@ -31,7 +31,8 @@ class Nave(Sprite):
         para simular un refresco (1ª versión)"""
         self.tiempo_renacer = pg.time.get_ticks()/1000
         self.nave_escondida = True
-        self.rect.y = -1000
+        self.rect.centery = -1000
+        self.rect.x = -1000
 
     def aterrizar_nave(self, aterrizando, pantalla):
         """Este método hace las maniobras de aterrizaje de la nave"""
@@ -43,8 +44,8 @@ class Nave(Sprite):
             else:
                 self.rect.y += self.velocidad_aterrizar
 
-            if self.rect.x > ANCHO_P/2 + 30:
-                self.rect.x = ANCHO_P/2 + 30
+            if self.rect.x > ANCHO_P/2 + 45:
+                self.rect.x = ANCHO_P/2 + 45
                 self.rotacion = True
 
                 if self.angulo == 180:
@@ -160,11 +161,11 @@ class MeteoritoMediano(Meteorito):
 
     def __init__(self, puntuacion):
         super().__init__(puntuacion)
-        self.w = 96
-        self.h = 96
+        self.w = 85
+        self.h = 85
         self.velocidad_x = random.randint(4, 6)
         self.plantilla_imagenes = pg.image.load(os.path.join(
-            "resources", "images", "asteroids_medium.png"))
+            "resources", "images", "aprueba.png"))
 
         # Para almacenar los frames del sprite sheet del meteorito mediano
         self.imagenes = []
