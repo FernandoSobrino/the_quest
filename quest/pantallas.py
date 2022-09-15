@@ -156,7 +156,7 @@ class PantallaJuego(Pantalla):
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
-                if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                if event.type == pg.KEYDOWN and event.key == pg.K_q:
                     salir = True
 
             # Para pintar el fondo del nivel
@@ -312,7 +312,7 @@ class PantallaJuego(Pantalla):
         font_file = os.path.join("resources", "fonts",
                                  "light_sans_serif_7.ttf")
         self.tipografia = pg.font.Font(font_file, 50)
-        mensaje = 'Pulsa "ESPACIO" para ir al nivel 2'
+        mensaje = 'Pulsa "Q" para ir al nivel 2'
         texto = self.tipografia.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
