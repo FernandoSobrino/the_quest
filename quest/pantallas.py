@@ -2,7 +2,7 @@ import os
 import random
 import pygame as pg
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, METEORITOS_M_NIVEL_1, METEORITOS_M_NIVEL_2, METEORITOS_NIVEL_1, METEORITOS_NIVEL_2, MUSICA_FADE_OUT, PUNTOS_1, PUNTOS_2, PUNTOS_M_1, PUNTOS_M_2, PUNTOS_M_DR, PUNTOS_PARTIDA, RUTA
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, MARGEN_INFERIOR_TEXTOS, METEORITOS_M_NIVEL_1, METEORITOS_M_NIVEL_2, METEORITOS_NIVEL_1, METEORITOS_NIVEL_2, MUSICA_FADE_OUT, PUNTOS_1, PUNTOS_2, PUNTOS_M_1, PUNTOS_M_2, PUNTOS_M_DR, PUNTOS_PARTIDA, RUTA
 
 from .objetos import Explosion, Meteorito, MeteoritoDorado, MeteoritoMediano, Nave, Planeta
 from .records import GestorBD, InputBox
@@ -58,7 +58,7 @@ class PantallaPrincipal(Pantalla):
         texto = self.tipo_historia.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
-        pos_y = ALTO_P - 75
+        pos_y = ALTO_P - MARGEN_INFERIOR_TEXTOS
         self.pantalla.blit(texto, (pos_x, pos_y))
 
     def pintar_texto_instrucciones(self):
@@ -71,7 +71,7 @@ class PantallaPrincipal(Pantalla):
                     "Pierdes vidas si chocas con los meteoritos.",
                     "5. Aguanta el tiempo suficiente para aterrizar en el planeta."]
 
-        pos_x = ANCHO_P - 800
+        pos_x = ANCHO_P//5
         conta_posiciones = 0
 
         for mensaje in mensajes:
@@ -128,7 +128,7 @@ class PantallaHistoria(Pantalla):
         anio = "2045"
         texto = self.tipo_titulo.render(anio, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
-        pos_x = (ANCHO_P - ancho_texto - 30)/2
+        pos_x = (ANCHO_P - ancho_texto)//2
         pos_y = ALTO_P/6
         self.pantalla.blit(texto, (pos_x, pos_y))
 
@@ -154,8 +154,8 @@ class PantallaHistoria(Pantalla):
         mensaje = 'Pulsa "ESPACIO" para comenzar la partida'
         texto = self.tipo_juego.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
-        pos_x = (ANCHO_P - ancho_texto)/2
-        pos_y = ALTO_P - 75
+        pos_x = (ANCHO_P - ancho_texto)//2
+        pos_y = ALTO_P - MARGEN_INFERIOR_TEXTOS
         self.pantalla.blit(texto, (pos_x, pos_y))
 
 
@@ -391,7 +391,7 @@ class PantallaJuego(Pantalla):
         texto = self.tipografia.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
-        pos_y = (ALTO_P - texto.get_height()) - 100
+        pos_y = (ALTO_P - texto.get_height()) - MARGEN_INFERIOR_TEXTOS
         self.pantalla.blit(texto, (pos_x, pos_y))
 
     def pintar_fondo(self):
@@ -564,7 +564,7 @@ class PantallaRecords(Pantalla):
             self.pintar_fondo()
 
             # Para pintar los nombres y los records en la pantalla
-            self.pintar_titulos_records()
+            self.pintar_texto_reiniciar()
             try:
                 self.pintar_records(self.nombres_render, self.puntos_render,
                                     texto_renderizar, texto_renderizar2)
@@ -596,14 +596,27 @@ class PantallaRecords(Pantalla):
         self.pantalla.blit(self.fondo, (0, 0))
 
     def pintar_mensaje_error(self):
-        mensaje_error = "No hay records registrados"
+        mensaje_error = "NO HAY RECORDS REGISTRADOS"
         mensaje_error_render = self.tipo_titulos.render(
-            mensaje_error, True, COLOR_TEXTO2)
+            mensaje_error, True, COLOR_TEXTO)
         pos_x_error = (ANCHO_P - mensaje_error_render.get_width())/2
-        pos_y_error = 300
+        pos_y_error = (ALTO_P - mensaje_error_render.get_height())/3
         self.pantalla.blit(mensaje_error_render, (pos_x_error, pos_y_error))
 
-    def pintar_titulos_records(self):
+    def pintar_texto_reiniciar(self):
+        # para pintar el mensaje de volver a jugar
+        texto_reiniciar = 'Pulsa "ESPACIO" para jugar de nuevo'
+        reiniciar_render = self.tipo_reiniciar.render(
+            texto_reiniciar, True, COLOR_TEXTO2)
+        ancho_texto = reiniciar_render.get_width()
+        pos_x_fin = (ANCHO_P - ancho_texto)/2
+        pos_y_fin = ALTO_P - reiniciar_render.get_height() - MARGEN_INFERIOR_TEXTOS
+        self.pantalla.blit(
+            reiniciar_render, (pos_x_fin, pos_y_fin))
+
+    def pintar_records(self, nombres, puntos, renderizado, renderizado2):
+        "Este método hace el pintado de los datos de los records"
+
         # para pintar los títulos de los records
         pos_x_titulo = 300
         pos_x_titulo2 = 560
@@ -621,29 +634,16 @@ class PantallaRecords(Pantalla):
         self.pantalla.blit(puntos_jugador_render,
                            (pos_x_titulo2, pos_y_titulo))
 
-    def pintar_records(self, nombres, puntos, renderizado, renderizado2):
-        "Este método hace el pintado de los datos de los records"
-
         # para pintar los datos de los records
-        salto_linea = 200
+        inicio_linea = 200
         separacion_x = 180
 
         for i in range(len(nombres)):
-            pos_x = ANCHO_P/3 + renderizado.get_width() - 50
-            pos_y = i * renderizado.get_height() + salto_linea
+            pos_x = (ANCHO_P - renderizado.get_width())//3
+            pos_y = i * renderizado.get_height() + inicio_linea
             self.pantalla.blit(nombres[i], (pos_x, pos_y))
 
         for j in range(len(puntos)):
-            pos_x2 = ANCHO_P/3 + renderizado2.get_width() + separacion_x
-            pos_y2 = j * renderizado.get_height() + salto_linea
+            pos_x2 = (ANCHO_P - renderizado2.get_width() + separacion_x)//2
+            pos_y2 = j * renderizado.get_height() + inicio_linea
             self.pantalla.blit(puntos[j], (pos_x2, pos_y2))
-
-        # para pintar el mensaje de volver a jugar
-        texto_reiniciar = 'Pulsa "ESPACIO" para jugar de nuevo'
-        reiniciar_render = self.tipo_reiniciar.render(
-            texto_reiniciar, True, COLOR_TEXTO2)
-        ancho_texto = reiniciar_render.get_width()
-        pos_x_fin = (ANCHO_P - ancho_texto)/2
-        pos_y_fin = ALTO_P - 75
-        self.pantalla.blit(
-            reiniciar_render, (pos_x_fin, pos_y_fin))
