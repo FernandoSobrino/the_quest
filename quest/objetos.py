@@ -8,7 +8,7 @@ from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS, MARGEN_LATERAL, POS_PLANETA, P
 
 
 class Nave(Sprite):
-
+    "Clase que construye el objeto nave"
     def __init__(self):
         super().__init__()
         self.image = pg.image.load(os.path.join(
@@ -27,8 +27,8 @@ class Nave(Sprite):
         self.fin_rotacion = False
 
     def esconder_nave(self):
-        """Este método permite posicionar la nave en un punto lejano de la pantalla tras morir
-        para simular un refresco (1ª versión)"""
+        """Este método permite posicionar la nave en un punto lejano de la pantalla 
+        tras colisionar para simular un refresco"""
         self.tiempo_renacer = pg.time.get_ticks()/1000
         self.nave_escondida = True
         self.rect.centery = -1000
@@ -93,7 +93,7 @@ class Nave(Sprite):
 
 
 class Meteorito(Sprite):
-    """Superclase Meteorito"""
+    """Superclase Meteorito (corresponde al meteorito grande)"""
     puntuacion = PUNTOS_PARTIDA
 
     def __init__(self, puntuacion):
@@ -156,7 +156,7 @@ class Meteorito(Sprite):
 
 
 class MeteoritoMediano(Meteorito):
-    """Subclase. Sólo conserva aquellos atributos que difieren de la superclase
+    """Subclase. Sólo añade aquellos atributos que difieren de la superclase
     Meteorito"""""
 
     def __init__(self, puntuacion):
@@ -174,7 +174,7 @@ class MeteoritoMediano(Meteorito):
 
 
 class MeteoritoDorado(Meteorito):
-    """Subclase. Sólo conserva aquellos atributos que difieren de la superclase
+    """Subclase. Sólo añade aquellos atributos que difieren de la superclase
     Meteorito"""""
 
     def __init__(self, puntuacion):
@@ -194,6 +194,7 @@ class MeteoritoDorado(Meteorito):
 
 
 class Planeta(Sprite):
+    "Clase que forma el objeto planeta"
     def __init__(self, imagen):
         self.image = imagen
         self.rect = self.image.get_rect()
@@ -257,6 +258,7 @@ class Explosion(Sprite):
 
 
 class Marcador:
+    "Clase que forma el marcador de puntos y de vidas del jugador"
     def __init__(self, vidas_iniciales):
         self.valor = 0
         self.vidas = vidas_iniciales
