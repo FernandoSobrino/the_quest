@@ -601,7 +601,7 @@ class PantallaRecords(Pantalla):
 
         # para pintar los datos de los records
         salto_linea = 200
-        separacion_x = 200
+        separacion_x = 180
 
         for i in range(len(nombres)):
             pos_x = ANCHO_P/3 + renderizado.get_width() - 50
@@ -609,7 +609,7 @@ class PantallaRecords(Pantalla):
             self.pantalla.blit(nombres[i], (pos_x, pos_y))
 
         for j in range(len(puntos)):
-            pos_x2 = ANCHO_P/3 + renderizado2.get_width() + separacion_x + 25
+            pos_x2 = ANCHO_P/3 + renderizado2.get_width() + separacion_x
             pos_y2 = j * renderizado.get_height() + salto_linea
             self.pantalla.blit(puntos[j], (pos_x2, pos_y2))
 
