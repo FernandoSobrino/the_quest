@@ -34,15 +34,14 @@ class PantallaPrincipal(Pantalla):
         salir = False
         while not salir:
             for event in pg.event.get():
-                if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                if event.type == pg.KEYDOWN and event.key == pg.K_h:
                     salir = True
                 if event.type == pg.QUIT:
                     pg.quit()
-            self.pantalla.fill((0, 0, 0))
             self.pintar_fondo()
             self.pintar_texto_titulo()
             self.pintar_texto_instrucciones()
-            self.pintar_texto_partida()
+            self.pintar_texto_historia()
             pg.display.flip()
 
     def pintar_fondo(self):
@@ -70,8 +69,8 @@ class PantallaPrincipal(Pantalla):
                 texto_render, (pos_x, posiciones[conta_posiciones]))
             conta_posiciones += 1
 
-    def pintar_texto_partida(self):
-        mensaje = 'Pulsa "ESPACIO" para comenzar la partida'
+    def pintar_texto_historia(self):
+        mensaje = 'Pulsa "H" para conocer la historia del juego'
         texto = self.tipo_juego.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
@@ -86,6 +85,73 @@ class PantallaPrincipal(Pantalla):
         pos_y = ALTO_P/8
         self.pantalla.blit(texto, (pos_x, pos_y))
 
+    
+class PantallaHistoria(Pantalla):
+    def __init__(self, pantalla: pg.Surface):
+        super().__init__(pantalla)
+
+        font_file = os.path.join("resources", "fonts",
+                                 "light_sans_serif_7.ttf")
+        font_file2 = os.path.join("resources", "fonts",
+                                  "game_sans_serif_7.ttf")
+        self.tipografia = pg.font.Font(font_file, 75)
+        self.tipo_juego = pg.font.Font(font_file2, 30)
+        self.tipo_info = pg.font.Font(font_file2, 25)
+
+    def bucle_principal(self):
+        salir = False
+
+        while not salir:
+            for event in pg.event.get():
+                if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                    salir = True
+                if event.type == pg.QUIT:
+                    pg.quit()
+            self.pintar_fondo()
+            self.pintar_texto_historia()
+            self.pintar_texto_partida()
+            pg.display.flip()
+
+    def pintar_fondo(self):
+        self.fondo = pg.image.load(os.path.join(
+            "resources", "images", "fondo_intro.jpg"))
+        self.pantalla.blit(self.fondo, (0, 0))
+
+    def pintar_texto_historia(self):
+        #Pinta el texto del año
+        anio = "2045"
+        texto = self.tipografia.render(anio, True, COLOR_TEXTO2)
+        ancho_texto = texto.get_width()
+        pos_x = (ANCHO_P - ancho_texto - 30)/2
+        pos_y = ALTO_P/6
+        self.pantalla.blit(texto, (pos_x, pos_y))
+
+        #Pinta el texto de la historia
+        posiciones = [300, 350, 400, 475, 525]
+        mensajes = ["La Tierra se ha devastado por una fuerte tormenta solar.",
+                    "Los unicos supervivientes viajan en una nave espacial,",
+                     "en busca de un nuevo planeta habitable.",
+                     "Esquiva los peligros del espacio y consigue",
+                     "liberar a la raza humana de la extincion inminente."]
+
+        pos_x = ANCHO_P - 900
+        conta_posiciones = 0
+
+        for mensaje in mensajes:
+            texto_render = self.tipo_info.render(
+                (mensaje), True, COLOR_TEXTO)
+            self.pantalla.blit(
+                texto_render, (pos_x, posiciones[conta_posiciones]))
+            conta_posiciones += 1
+
+    def pintar_texto_partida(self):
+        mensaje = 'Pulsa "ESPACIO" para comenzar la partida'
+        texto = self.tipo_juego.render(mensaje, True, COLOR_TEXTO2)
+        ancho_texto = texto.get_width()
+        pos_x = (ANCHO_P - ancho_texto)/2
+        pos_y = ALTO_P - 75
+        self.pantalla.blit(texto, (pos_x, pos_y))
+        
 
 class PantallaJuego(Pantalla):
 
@@ -556,3 +622,6 @@ class PantallaRecords(Pantalla):
         pos_y_fin = ALTO_P - 75
         self.pantalla.blit(
             reiniciar_render, (pos_x_fin, pos_y_fin))
+
+
+
