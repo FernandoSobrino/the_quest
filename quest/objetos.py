@@ -165,7 +165,7 @@ class MeteoritoMediano(Meteorito):
         self.h = 85
         self.velocidad_x = random.randint(4, 6)
         self.plantilla_imagenes = pg.image.load(os.path.join(
-            "resources", "images", "aprueba.png"))
+            "resources", "images", "asteroids_medium.png"))
 
         # Para almacenar los frames del sprite sheet del meteorito mediano
         self.imagenes = []
