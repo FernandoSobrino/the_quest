@@ -2,7 +2,7 @@ import os
 import random
 import pygame as pg
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, METEORITOS_M_NIVEL_1, METEORITOS_M_NIVEL_2, METEORITOS_NIVEL_1, METEORITOS_NIVEL_2, MUSICA_FADE_OUT, PUNTOS_1, PUNTOS_2, PUNTOS_M_1, PUNTOS_M_2, PUNTOS_PARTIDA, RUTA
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, METEORITOS_M_NIVEL_1, METEORITOS_M_NIVEL_2, METEORITOS_NIVEL_1, METEORITOS_NIVEL_2, MUSICA_FADE_OUT, PUNTOS_1, PUNTOS_2, PUNTOS_M_1, PUNTOS_M_2, PUNTOS_M_DR, PUNTOS_PARTIDA, RUTA
 
 from .objetos import Explosion, Meteorito, MeteoritoDorado, MeteoritoMediano, Nave, Planeta
 from .records import GestorBD, InputBox
@@ -93,15 +93,16 @@ class PantallaJuego(Pantalla):
         super().__init__(pantalla)
 
         # creación de la nave
-        self.jugador = Nave()
+        self.nave = Nave()
 
-        # creación de los meteoritos
+        # creación de los meteoritos de nivel 1
         self.meteoritos = pg.sprite.Group()
         self.crear_meteoritos(METEORITOS_NIVEL_1, PUNTOS_1)
 
         self.meteoritos_m = pg.sprite.Group()
         self.crear_meteoritos_m(METEORITOS_M_NIVEL_1, PUNTOS_M_1)
 
+        # creación del meteorito recompensa (Sprite Group)
         self.grupo_dorado = pg.sprite.Group()
 
         # creación del planeta
@@ -120,7 +121,7 @@ class PantallaJuego(Pantalla):
             "resources", "sounds", "sonido_explosion.wav"))
 
         # carga del sonido del meteorito dorado al recogerse
-        self.sonido_meteorito = pg.mixer.Sound(os.path.join(
+        self.sonido_bonus = pg.mixer.Sound(os.path.join(
             "resources", "sounds", "sonido_meteorito.mp3"))
 
         # carga de la música del juego
@@ -141,7 +142,7 @@ class PantallaJuego(Pantalla):
         aterrizaje = False
 
         # Flag que controla la salida de un meteorito dorado en la partida
-        meteorito_instanciado = False
+        meteorito_bonus = False
 
         # Reproducción de la música del juego (en bucle)
         pg.mixer.music.play(-1)
@@ -179,16 +180,16 @@ class PantallaJuego(Pantalla):
             # Condición para que en un momento aleatorio en el rango marcado,
             # salga un meteorito dorado que otorga 1000 puntos al jugador.
             if contador_juego == random.randint(20, 40):
-                if not meteorito_instanciado:
+                if not meteorito_bonus:
                     self.crear_meteorito_dorado()
-                    meteorito_instanciado = True
+                    meteorito_bonus = True
 
             # Condición que activa el flag de aterrizaje (Tiempo transcurrido)
             if contador_juego == 45:
                 aterrizaje = True
 
             # Condiciones para realizar la finalización de nivel 1
-            if self.jugador.fin_rotacion:
+            if self.nave.fin_rotacion:
                 self.pintar_fin_nivel("¡NIVEL 1 SUPERADO!")
                 self.pintar_nivel_2()
 
@@ -233,26 +234,26 @@ class PantallaJuego(Pantalla):
         "Método que controla el comportamiento de los meteoritos de la partida"
         if not aterrizar:
             colision = pg.sprite.spritecollide(
-                self.jugador, self.meteoritos, True)
+                self.nave, self.meteoritos, True)
             colision_m = pg.sprite.spritecollide(
-                self.jugador, self.meteoritos_m, True)
+                self.nave, self.meteoritos_m, True)
             colision_dorado = pg.sprite.spritecollide(
-                self.jugador, self.grupo_dorado, True)
+                self.nave, self.grupo_dorado, True)
 
             if colision or colision_m:
-                explosion = Explosion(self.jugador.rect.center)
+                explosion = Explosion(self.nave.rect.center)
                 self.explosiones.add(explosion)
-                self.jugador.esconder_nave()
+                self.nave.esconder_nave()
                 self.sonido_explosion.play()
                 self.marcador.perder_vida()
             if colision_dorado:
-                self.marcador.aumentar_puntos(1000)
+                self.marcador.aumentar_puntos(PUNTOS_M_DR)
                 self.marcador.sumar_vida()
-                self.sonido_meteorito.play()
+                self.sonido_bonus.play()
 
             for meteorito in self.meteoritos.sprites():
                 if meteorito.rect.right < 0:
-                    if not self.jugador.nave_escondida:
+                    if not self.nave.nave_escondida:
                         self.marcador.aumentar_puntos(meteorito.puntos)
                     self.meteoritos.remove(meteorito)
             if len(self.meteoritos.sprites()) < 1:
@@ -260,7 +261,7 @@ class PantallaJuego(Pantalla):
 
             for meteorito_m in self.meteoritos_m.sprites():
                 if meteorito_m.rect.right < 0:
-                    if not self.jugador.nave_escondida:
+                    if not self.nave.nave_escondida:
                         self.marcador.aumentar_puntos(meteorito_m.puntos)
                     self.meteoritos_m.remove(meteorito_m)
             if len(self.meteoritos_m.sprites()) < 1:
@@ -274,12 +275,12 @@ class PantallaJuego(Pantalla):
         pg.mixer.music.fadeout(MUSICA_FADE_OUT)
         bd = GestorBD(RUTA)
         record_minimo = bd.comprobarRecord()
-        if record_minimo == None and self.marcador.valor != 0:
+        if record_minimo == None and self.marcador.valor > 0:
             inputbox = InputBox(self.pantalla)
             nombre = inputbox.recoger_nombre()
             bd.guardarRecords(nombre, self.marcador.valor)
         if record_minimo != None and record_minimo < self.marcador.valor:
-            if self.marcador.valor != 0:
+            if self.marcador.valor > 0:
                 inputbox = InputBox(self.pantalla)
                 nombre = inputbox.recoger_nombre()
                 bd.actualizarRecord(
@@ -287,13 +288,13 @@ class PantallaJuego(Pantalla):
 
     def mover_nave_planeta(self, aterrizar):
         "Método que incluye las maniobras de la nave y el comportamiento del planeta"
-        self.jugador.update()
+        self.nave.update()
         if not aterrizar:
-            self.pantalla.blit(self.jugador.image, self.jugador.rect)
+            self.pantalla.blit(self.nave.image, self.nave.rect)
         else:
             self.pantalla.blit(self.planeta.image, self.planeta.rect)
             self.planeta.mover_planeta(aterrizar)
-            self.jugador.aterrizar_nave(aterrizar, self.pantalla)
+            self.nave.aterrizar_nave(aterrizar, self.pantalla)
 
     def pintar_fin_nivel(self, texto):
         "Método que pinta el mensaje que indica el fin del nivel"
@@ -346,7 +347,7 @@ class PantallaJuego2(PantallaJuego):
     def __init__(self, pantalla: pg.Surface, marcador):
         super().__init__(pantalla, marcador)
 
-        # creación de los meteoritos
+        # creación de los meteoritos de nivel 2
         self.meteoritos = pg.sprite.Group()
         self.crear_meteoritos(METEORITOS_NIVEL_2, PUNTOS_2)
 
@@ -372,7 +373,7 @@ class PantallaJuego2(PantallaJuego):
         aterrizaje = False
 
         # Flag que controla la salida de un meteorito dorado en la partida
-        meteorito_instanciado = False
+        meteorito_bonus = False
 
         # Reproducción de la música del juego (en bucle)
         pg.mixer.music.play(-1)
@@ -408,16 +409,16 @@ class PantallaJuego2(PantallaJuego):
             # Condición para que en un momento aleatorio en el rango marcado,
             # salga un meteorito dorado que otorga 1000 puntos al jugador.
             if contador_juego == random.randint(30, 60):
-                if not meteorito_instanciado:
+                if not meteorito_bonus:
                     self.crear_meteorito_dorado()
-                    meteorito_instanciado = True
+                    meteorito_bonus = True
 
             # Condición que activa el flag de aterrizaje (Tiempo transcurrido)
             if contador_juego == 90:
                 aterrizaje = True
 
             # Condiciones para realizar la finalización de nivel 2
-            if self.jugador.fin_rotacion:
+            if self.nave.fin_rotacion:
                 self.pintar_fin_nivel("¡ENHORABUENA! HAS GANADO")
 
             if contador_juego == 110:
