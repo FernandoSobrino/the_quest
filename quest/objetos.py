@@ -45,6 +45,7 @@ class Nave(Sprite):
 
             if self.rect.x > ANCHO_P/2 + 45:
                 self.rect.x = ANCHO_P/2 + 45
+                self.rect.centery = ALTO_P/2
                 self.rotacion = True
 
                 if self.angulo == 180:
