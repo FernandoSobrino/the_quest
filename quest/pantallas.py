@@ -10,6 +10,7 @@ from .records import GestorBD, InputBox
 
 class Pantalla:
     "Clase base de la pantalla de la que heredan el resto"
+
     def __init__(self, pantalla: pg.Surface):
 
         self.pantalla = pantalla
@@ -21,6 +22,7 @@ class Pantalla:
 
 class PantallaPrincipal(Pantalla):
     "Clase que controla la pantalla principal"
+
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
 
@@ -58,7 +60,7 @@ class PantallaPrincipal(Pantalla):
         pos_x = (ANCHO_P - ancho_texto)/2
         pos_y = ALTO_P - 75
         self.pantalla.blit(texto, (pos_x, pos_y))
-    
+
     def pintar_texto_instrucciones(self):
 
         posiciones = [275, 350, 400, 450, 500, 550]
@@ -87,9 +89,10 @@ class PantallaPrincipal(Pantalla):
         pos_y = ALTO_P/8
         self.pantalla.blit(texto, (pos_x, pos_y))
 
-    
+
 class PantallaHistoria(Pantalla):
     "Clase que controla la pantalla de la historia del juego"
+
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
 
@@ -121,7 +124,7 @@ class PantallaHistoria(Pantalla):
         self.pantalla.blit(self.fondo, (0, 0))
 
     def pintar_texto_historia(self):
-        #Pinta el texto del año
+        # Pinta el texto del año
         anio = "2045"
         texto = self.tipo_titulo.render(anio, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
@@ -129,13 +132,13 @@ class PantallaHistoria(Pantalla):
         pos_y = ALTO_P/6
         self.pantalla.blit(texto, (pos_x, pos_y))
 
-        #Pinta el texto de la historia
+        # Pinta el texto de la historia
         posiciones = [300, 350, 400, 475, 525]
         mensajes = ["La Tierra se ha devastado por una fuerte tormenta solar.",
                     "Los unicos supervivientes viajan en una nave espacial,",
-                     "en busca de un nuevo planeta habitable.",
-                     "Esquiva los peligros del espacio y consigue",
-                     "liberar a la raza humana de la extincion inminente."]
+                    "en busca de un nuevo planeta habitable.",
+                    "Esquiva los peligros del espacio y consigue",
+                    "liberar a la raza humana de la extincion inminente."]
 
         pos_x = ANCHO_P - 900
         conta_posiciones = 0
@@ -154,10 +157,11 @@ class PantallaHistoria(Pantalla):
         pos_x = (ANCHO_P - ancho_texto)/2
         pos_y = ALTO_P - 75
         self.pantalla.blit(texto, (pos_x, pos_y))
-        
+
 
 class PantallaJuego(Pantalla):
     "Clase que controla el primer nivel del juego"
+
     def __init__(self, pantalla: pg.Surface, marcador):
         super().__init__(pantalla)
 
@@ -226,8 +230,9 @@ class PantallaJuego(Pantalla):
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
-                if event.type == pg.KEYDOWN and event.key == pg.K_q:
-                    salir = True
+                if self.nave.fin_rotacion:
+                    if event.type == pg.KEYDOWN and event.key == pg.K_q:
+                        salir = True
 
             # Para pintar el fondo del nivel
             self.pintar_fondo()
@@ -414,6 +419,7 @@ class PantallaJuego(Pantalla):
 
 class PantallaJuego2(PantallaJuego):
     "Clase que controla el segundo nivel del juego"
+
     def __init__(self, pantalla: pg.Surface, marcador):
         super().__init__(pantalla, marcador)
 
@@ -510,6 +516,7 @@ class PantallaJuego2(PantallaJuego):
 
 class PantallaRecords(Pantalla):
     "Clase que controla la pantalla de records del juego"
+
     def __init__(self, pantalla: pg.Surface):
         super().__init__(pantalla)
         self.musica = pg.mixer.music.load(os.path.join(
@@ -533,7 +540,7 @@ class PantallaRecords(Pantalla):
         pg.mixer.music.play(-1)
         self.cargar_datos()
 
-    # Renderizado de cada una de las listas de NOMBRE y PUNTOS
+        # Renderizado de cada una de las listas de NOMBRE y PUNTOS
         for nombre in self.nombres_record:
             texto_renderizar = self.tipografia.render(str(nombre),
                                                       True, COLOR_TEXTO2)
@@ -557,15 +564,18 @@ class PantallaRecords(Pantalla):
             self.pintar_fondo()
 
             # Para pintar los nombres y los records en la pantalla
-            self.pintar_records(self.nombres_render, self.puntos_render, texto_renderizar,
-                                texto_renderizar2)
+            self.pintar_titulos_records()
+            try:
+                self.pintar_records(self.nombres_render, self.puntos_render,
+                                    texto_renderizar, texto_renderizar2)
+            except UnboundLocalError:
+                self.pintar_mensaje_error()
 
             # Recarga de todos los elementos presentes en la pantalla
             pg.display.flip()
 
 
 # -------- MÉTODOS PARA PINTAR LOS ELEMENTOS QUE SE MUESTRAN EN LA PANTALLA --------- #
-
 
     def cargar_datos(self):
         """Este método almacena los elementos a pintar en listas independientes para
@@ -585,8 +595,15 @@ class PantallaRecords(Pantalla):
             "resources", "images", "fondo_intro.jpg"))
         self.pantalla.blit(self.fondo, (0, 0))
 
-    def pintar_records(self, nombres, puntos, renderizado, renderizado2):
-        "Este método hace el pintado de información (títulos y datos) de los records"
+    def pintar_mensaje_error(self):
+        mensaje_error = "No hay records registrados"
+        mensaje_error_render = self.tipo_titulos.render(
+            mensaje_error, True, COLOR_TEXTO2)
+        pos_x_error = (ANCHO_P - mensaje_error_render.get_width())/2
+        pos_y_error = 300
+        self.pantalla.blit(mensaje_error_render, (pos_x_error, pos_y_error))
+
+    def pintar_titulos_records(self):
         # para pintar los títulos de los records
         pos_x_titulo = 300
         pos_x_titulo2 = 560
@@ -603,6 +620,9 @@ class PantallaRecords(Pantalla):
             titulo_puntos, True, COLOR_TEXTO)
         self.pantalla.blit(puntos_jugador_render,
                            (pos_x_titulo2, pos_y_titulo))
+
+    def pintar_records(self, nombres, puntos, renderizado, renderizado2):
+        "Este método hace el pintado de los datos de los records"
 
         # para pintar los datos de los records
         salto_linea = 200
@@ -627,6 +647,3 @@ class PantallaRecords(Pantalla):
         pos_y_fin = ALTO_P - 75
         self.pantalla.blit(
             reiniciar_render, (pos_x_fin, pos_y_fin))
-
-
-
