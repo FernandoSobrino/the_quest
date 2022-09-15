@@ -81,7 +81,7 @@ class PantallaPrincipal(Pantalla):
 
     def pintar_texto_titulo(self):
         mensaje = "THE QUEST"
-        texto = self.tipografia.render(mensaje, True, COLOR_TEXTO2)
+        texto = self.tipo_titulo.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)/2
         pos_y = ALTO_P/8
