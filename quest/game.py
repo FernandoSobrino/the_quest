@@ -11,7 +11,7 @@ class Quest:
         pg.init()
         self.display = pg.display.set_mode((ANCHO_P, ALTO_P))
         icono_juego = pg.image.load(os.path.join(
-        "resources","images","icono_planeta.png"))
+            "resources", "images", "icono_planeta.png"))
         pg.display.set_icon(icono_juego)
         pg.display.set_caption("THE QUEST")
         pg.mixer.init()
