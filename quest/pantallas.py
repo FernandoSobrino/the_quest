@@ -2,7 +2,7 @@ import os
 import random
 import pygame as pg
 
-from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, MARGEN_INFERIOR_TEXTOS, METEORITOS_M_NIVEL_1, METEORITOS_M_NIVEL_2, METEORITOS_NIVEL_1, METEORITOS_NIVEL_2, MUSICA_FADE_OUT, PUNTOS_1, PUNTOS_2, PUNTOS_M_1, PUNTOS_M_2, PUNTOS_M_DR, PUNTOS_PARTIDA, RUTA
+from . import ANCHO_P, ALTO_P, COLOR_TEXTO, COLOR_TEXTO2, FPS, MARGEN_INFERIOR_TEXTOS, MAX_METEO_1, MAX_METEO_2, MAX_METEO_M_1, MAX_METEO_M_2, MIN_METEO_1, MIN_METEO_2, MIN_METEO_M_1, MIN_METEO_M_2, MUSICA_FADE_OUT, PUNTOS_1, PUNTOS_2, PUNTOS_M_1, PUNTOS_M_2, PUNTOS_M_DR, PUNTOS_PARTIDA, RUTA
 
 from .objetos import Explosion, Meteorito, MeteoritoDorado, MeteoritoMediano, Nave, Planeta
 from .records import GestorBD, InputBox
@@ -109,7 +109,7 @@ class PantallaHistoria(Pantalla):
 
         while not salir:
             for event in pg.event.get():
-                if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
                     salir = True
                 if event.type == pg.QUIT:
                     pg.quit()
@@ -151,7 +151,7 @@ class PantallaHistoria(Pantalla):
             conta_posiciones += 1
 
     def pintar_texto_partida(self):
-        mensaje = 'Pulsa "ESPACIO" para comenzar la partida'
+        mensaje = 'Pulsa "INTRO" para comenzar la partida'
         texto = self.tipo_juego.render(mensaje, True, COLOR_TEXTO2)
         ancho_texto = texto.get_width()
         pos_x = (ANCHO_P - ancho_texto)//2
@@ -170,10 +170,10 @@ class PantallaJuego(Pantalla):
 
         # creación de los meteoritos de nivel 1
         self.meteoritos = pg.sprite.Group()
-        self.crear_meteoritos(METEORITOS_NIVEL_1, PUNTOS_1)
+        self.crear_meteoritos(MIN_METEO_1,MAX_METEO_1,PUNTOS_1)
 
         self.meteoritos_m = pg.sprite.Group()
-        self.crear_meteoritos_m(METEORITOS_M_NIVEL_1, PUNTOS_M_1)
+        self.crear_meteoritos_m(MIN_METEO_M_1,MAX_METEO_M_1,PUNTOS_M_1)
 
         # creación del meteorito recompensa (Sprite Group)
         self.grupo_dorado = pg.sprite.Group()
@@ -246,7 +246,7 @@ class PantallaJuego(Pantalla):
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave. También desactiva colisiones durante el aterrizaje
             self.comportamiento_meteoritos(aterrizaje,
-                                           METEORITOS_NIVEL_1, PUNTOS_1, METEORITOS_M_NIVEL_1, PUNTOS_M_1)
+                MIN_METEO_1,MAX_METEO_1, PUNTOS_1, MIN_METEO_M_1,MAX_METEO_M_2, PUNTOS_M_1)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
@@ -281,19 +281,19 @@ class PantallaJuego(Pantalla):
 
     # -------------MÉTODOS DE FUNCIONAMIENTO PERTENECIENTES A LA PARTIDA-----------#
 
-    def crear_meteoritos(self, numero, no_puntos):
+    def crear_meteoritos(self, num_min, num_max, no_puntos):
         """"Método que genera los meteoritos grandes al inicio de la partida, les asigna puntuación y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos = random.randrange(numero)
+        cantidad_meteoritos = random.randrange(num_min,num_max)
         for i in range(cantidad_meteoritos):
             puntos = (i + no_puntos) - i
             meteorito = Meteorito(puntos)
             self.meteoritos.add(meteorito)
 
-    def crear_meteoritos_m(self, numero, no_puntos):
+    def crear_meteoritos_m(self, num_min, num_max, no_puntos):
         """"Método que genera los meteoritos medianos al inicio de la partida, les asigna puntuación
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos_m = random.randrange(numero)
+        cantidad_meteoritos_m = random.randrange(num_min,num_max)
         for i in range(cantidad_meteoritos_m):
             puntos_m = (i + no_puntos) - i
             meteorito_m = MeteoritoMediano(puntos_m)
@@ -304,7 +304,8 @@ class PantallaJuego(Pantalla):
         self.meteo_dorado = MeteoritoDorado(PUNTOS_PARTIDA)
         self.grupo_dorado.add(self.meteo_dorado)
 
-    def comportamiento_meteoritos(self, aterrizar, numero, puntos, numero_m, puntos_m):
+    def comportamiento_meteoritos(self, aterrizar, num_min, num_max, puntos, 
+    num_m_min, num_m_max, puntos_m):
         "Método que controla el comportamiento de los meteoritos de la partida"
         if not aterrizar:
             colision = pg.sprite.spritecollide(
@@ -331,7 +332,7 @@ class PantallaJuego(Pantalla):
                         self.marcador.aumentar_puntos(meteorito.puntos)
                     self.meteoritos.remove(meteorito)
             if len(self.meteoritos.sprites()) < 1:
-                self.crear_meteoritos(numero, puntos)
+                self.crear_meteoritos(num_min, num_max, puntos)
 
             for meteorito_m in self.meteoritos_m.sprites():
                 if meteorito_m.rect.right < 0:
@@ -339,7 +340,7 @@ class PantallaJuego(Pantalla):
                         self.marcador.aumentar_puntos(meteorito_m.puntos)
                     self.meteoritos_m.remove(meteorito_m)
             if len(self.meteoritos_m.sprites()) < 1:
-                self.crear_meteoritos_m(numero_m, puntos_m)
+                self.crear_meteoritos_m(num_m_min, num_m_max, puntos_m)
         else:
             self.meteoritos.clear(self.pantalla, self.pantalla)
             self.meteoritos_m.clear(self.pantalla, self.pantalla)
@@ -352,11 +353,15 @@ class PantallaJuego(Pantalla):
         if record_minimo == None and self.marcador.valor > 0:
             inputbox = InputBox(self.pantalla)
             nombre = inputbox.recoger_nombre()
+            if nombre == "":
+                nombre = "---"
             bd.guardarRecords(nombre, self.marcador.valor)
         if record_minimo != None and record_minimo < self.marcador.valor:
             if self.marcador.valor > 0:
                 inputbox = InputBox(self.pantalla)
                 nombre = inputbox.recoger_nombre()
+                if nombre == "":
+                    nombre = "---"
                 bd.actualizarRecord(
                     nombre, self.marcador.valor, record_minimo)
 
@@ -425,10 +430,10 @@ class PantallaJuego2(PantallaJuego):
 
         # creación de los meteoritos de nivel 2
         self.meteoritos = pg.sprite.Group()
-        self.crear_meteoritos(METEORITOS_NIVEL_2, PUNTOS_2)
+        self.crear_meteoritos(MIN_METEO_2,MAX_METEO_2, PUNTOS_2)
 
         self.meteoritos_m = pg.sprite.Group()
-        self.crear_meteoritos_m(METEORITOS_M_NIVEL_2, PUNTOS_M_2)
+        self.crear_meteoritos_m(MIN_METEO_M_2,MAX_METEO_M_2, PUNTOS_M_2)
 
         # creación del planeta
         imagen_planeta2 = pg.image.load(os.path.join("resources", "images",
@@ -477,7 +482,7 @@ class PantallaJuego2(PantallaJuego):
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave. También desactiva colisiones durante el aterrizaje
             self.comportamiento_meteoritos(aterrizaje,
-                                           METEORITOS_NIVEL_2, PUNTOS_2, METEORITOS_M_NIVEL_2, PUNTOS_M_2)
+                MIN_METEO_2,MAX_METEO_2, PUNTOS_2, MIN_METEO_M_2,MAX_METEO_M_2, PUNTOS_M_2)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
@@ -497,7 +502,7 @@ class PantallaJuego2(PantallaJuego):
             if self.nave.fin_rotacion:
                 self.pintar_fin_nivel("¡ENHORABUENA! HAS GANADO")
 
-            if contador_juego == 110:
+            if contador_juego == 105:
                 self.lanzarRecord()
                 salir = True
 
