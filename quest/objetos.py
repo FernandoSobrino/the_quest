@@ -6,8 +6,10 @@ from pygame.sprite import Sprite
 
 from . import ANCHO_P, ALTO_P, COLOR_TEXTO2, FPS, MARGEN_LATERAL, POS_PLANETA, PUNTOS_PARTIDA
 
+
 class Nave(Sprite):
     "Clase que construye el objeto nave"
+
     def __init__(self):
         super().__init__()
         self.image = pg.image.load(os.path.join(
@@ -195,6 +197,7 @@ class MeteoritoDorado(Meteorito):
 
 class Planeta(Sprite):
     "Clase que forma el objeto planeta"
+
     def __init__(self, imagen):
         self.image = imagen
         self.rect = self.image.get_rect()
@@ -229,6 +232,8 @@ class Explosion(Sprite):
         self.cargarFrames()
 
     def cargarFrames(self):
+        """Esta parte del código recorre el sprite sheet y almacena cada
+        fotograma en una lista para preparar la animación"""
 
         sprite_sheet = pg.image.load(os.path.join(
             "resources", "images", "imagen_explosiones.png"))
@@ -259,6 +264,7 @@ class Explosion(Sprite):
 
 class Marcador:
     "Clase que forma el marcador de puntos y de vidas del jugador"
+
     def __init__(self, vidas_iniciales):
         self.valor = 0
         self.vidas = vidas_iniciales
@@ -267,17 +273,23 @@ class Marcador:
         self.tipografia = pg.font.Font(font_file, 20)
 
     def perder_vida(self):
+        "Método para restar una vida en el marcador"
         self.vidas -= 1
         return self.vidas < 1
 
     def sumar_vida(self):
+        "Método para sumar una vida en el marcador"
         self.vidas += 1
 
     def aumentar_puntos(self, puntos):
+        "Método para aumentar puntos en el marcador"
         self.valor += puntos
 
     def pintar_marcador(self, pantalla):
-
+        "Método para pintar el marcador de vidas y puntos durante la partida"
+        margen_x_puntos = 600
+        margen_x_vidas = 100
+        margen_y = 30
         texto_puntos = f"Puntos: {self.valor}"
         texto_vidas = f"Vidas: {self.vidas}"
 
@@ -286,12 +298,12 @@ class Marcador:
         render_marcador = self.tipografia.render(
             str(texto_puntos), True, COLOR_TEXTO2)
 
-        pos_x_puntos = render_marcador.get_width() - 72
-        pos_y_puntos = ALTO_P - render_marcador.get_height() - 30
-        pg.surface.Surface.blit(pantalla, render_marcador,
-                                (pos_x_puntos, pos_y_puntos))
-
-        pos_x_vidas = render_vidas.get_width() - 60
-        pos_y_vidas = render_vidas.get_height() + 20
+        pos_x_vidas = render_vidas.get_width() + margen_x_vidas
+        pos_y_vidas = ALTO_P - render_vidas.get_height() - margen_y
         pg.surface.Surface.blit(pantalla, render_vidas,
                                 (pos_x_vidas, pos_y_vidas))
+
+        pos_x_puntos = render_marcador.get_width() + margen_x_puntos
+        pos_y_puntos = ALTO_P - render_marcador.get_height() - margen_y
+        pg.surface.Surface.blit(pantalla, render_marcador,
+                                (pos_x_puntos, pos_y_puntos))
