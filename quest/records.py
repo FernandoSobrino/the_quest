@@ -7,6 +7,7 @@ from . import ANCHO_P, ALTO_P, COLOR_CAJA_INPUT, COLOR_TEXTO_INPUT
 
 class GestorBD:
     "Clase que gestiona la base de datos"
+
     def __init__(self, ruta):
         self.ruta = ruta
 
@@ -89,6 +90,7 @@ class GestorBD:
 
 class InputBox:
     "Clase que dispone una entrada de texto en la pantalla de juego"
+    
     def __init__(self, pantalla: pg.Surface):
         font_file = os.path.join(
             "resources", "fonts", "game_sans_serif_7.ttf")
@@ -132,12 +134,12 @@ class InputBox:
     def pintar_elementos_fijos(self):
 
         self.titulo = self.tipografia.render(
-            "¡RECORD! INSERTA TUS INICIALES(3)", True, self.color_texto, self.color_fondo)
+            "¡RECORD! INSERTA TUS INICIALES (3) - (PULSA 'INTRO' PARA TERMINAR)", True, self.color_texto, self.color_fondo)
         self.x_titulo = (ANCHO_P-self.titulo.get_width())//2
-        self.y_titulo = (ALTO_P-self.titulo.get_height())//2
+        self.y_titulo = (ALTO_P-self.titulo.get_height())//3
 
         x_fondo = self.x_titulo - self.espacio
         y_fondo = self.y_titulo - self.espacio
-        w_fondo = self.titulo.get_width() + self.espacio * 2
+        w_fondo = self.titulo.get_width() + self.espacio * 3
         h_fondo = self.titulo.get_height() * 2 + self.espacio * 2
         self.fondo = pg.Rect(x_fondo, y_fondo, w_fondo, h_fondo)
