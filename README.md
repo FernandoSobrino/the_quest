@@ -73,7 +73,7 @@ Sigue los pasos 1 y 2 anteriores tal y como se indican.
 3. Instalar las dependencias
 
 ````
-pip install requirements-dev.txt
+pip install -r requirements-dev.txt
 ````
 
 4. Abre los archivos en tu IDE favorito
