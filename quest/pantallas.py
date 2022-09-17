@@ -170,10 +170,10 @@ class PantallaJuego(Pantalla):
 
         # creación de los meteoritos de nivel 1
         self.meteoritos = pg.sprite.Group()
-        self.crear_meteoritos(MIN_METEO_1,MAX_METEO_1,PUNTOS_1)
+        self.crear_meteoritos(MIN_METEO_1, MAX_METEO_1, PUNTOS_1)
 
         self.meteoritos_m = pg.sprite.Group()
-        self.crear_meteoritos_m(MIN_METEO_M_1,MAX_METEO_M_1,PUNTOS_M_1)
+        self.crear_meteoritos_m(MIN_METEO_M_1, MAX_METEO_M_1, PUNTOS_M_1)
 
         # creación del meteorito recompensa (Sprite Group)
         self.grupo_dorado = pg.sprite.Group()
@@ -246,7 +246,7 @@ class PantallaJuego(Pantalla):
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave. También desactiva colisiones durante el aterrizaje
             self.comportamiento_meteoritos(aterrizaje,
-                MIN_METEO_1,MAX_METEO_1, PUNTOS_1, MIN_METEO_M_1,MAX_METEO_M_2, PUNTOS_M_1)
+                                           MIN_METEO_1, MAX_METEO_1, PUNTOS_1, MIN_METEO_M_1, MAX_METEO_M_2, PUNTOS_M_1)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
@@ -284,7 +284,7 @@ class PantallaJuego(Pantalla):
     def crear_meteoritos(self, num_min, num_max, no_puntos):
         """"Método que genera los meteoritos grandes al inicio de la partida, les asigna puntuación y
         es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos = random.randrange(num_min,num_max)
+        cantidad_meteoritos = random.randrange(num_min, num_max)
         for i in range(cantidad_meteoritos):
             puntos = (i + no_puntos) - i
             meteorito = Meteorito(puntos)
@@ -293,7 +293,7 @@ class PantallaJuego(Pantalla):
     def crear_meteoritos_m(self, num_min, num_max, no_puntos):
         """"Método que genera los meteoritos medianos al inicio de la partida, les asigna puntuación
          y es llamado de nuevo desde el método regenerar las veces que el meteorito finaliza su ciclo de vida"""""
-        cantidad_meteoritos_m = random.randrange(num_min,num_max)
+        cantidad_meteoritos_m = random.randrange(num_min, num_max)
         for i in range(cantidad_meteoritos_m):
             puntos_m = (i + no_puntos) - i
             meteorito_m = MeteoritoMediano(puntos_m)
@@ -304,8 +304,8 @@ class PantallaJuego(Pantalla):
         self.meteo_dorado = MeteoritoDorado(PUNTOS_PARTIDA)
         self.grupo_dorado.add(self.meteo_dorado)
 
-    def comportamiento_meteoritos(self, aterrizar, num_min, num_max, puntos, 
-    num_m_min, num_m_max, puntos_m):
+    def comportamiento_meteoritos(self, aterrizar, num_min, num_max, puntos,
+                                  num_m_min, num_m_max, puntos_m):
         "Método que controla el comportamiento de los meteoritos de la partida"
         if not aterrizar:
             colision = pg.sprite.spritecollide(
@@ -430,10 +430,10 @@ class PantallaJuego2(PantallaJuego):
 
         # creación de los meteoritos de nivel 2
         self.meteoritos = pg.sprite.Group()
-        self.crear_meteoritos(MIN_METEO_2,MAX_METEO_2, PUNTOS_2)
+        self.crear_meteoritos(MIN_METEO_2, MAX_METEO_2, PUNTOS_2)
 
         self.meteoritos_m = pg.sprite.Group()
-        self.crear_meteoritos_m(MIN_METEO_M_2,MAX_METEO_M_2, PUNTOS_M_2)
+        self.crear_meteoritos_m(MIN_METEO_M_2, MAX_METEO_M_2, PUNTOS_M_2)
 
         # creación del planeta
         imagen_planeta2 = pg.image.load(os.path.join("resources", "images",
@@ -482,7 +482,7 @@ class PantallaJuego2(PantallaJuego):
             # Colisión de la nave con meteorito, aparece explosion (efecto y sonido) y
             # desaparece la nave. También desactiva colisiones durante el aterrizaje
             self.comportamiento_meteoritos(aterrizaje,
-                MIN_METEO_2,MAX_METEO_2, PUNTOS_2, MIN_METEO_M_2,MAX_METEO_M_2, PUNTOS_M_2)
+                                           MIN_METEO_2, MAX_METEO_2, PUNTOS_2, MIN_METEO_M_2, MAX_METEO_M_2, PUNTOS_M_2)
 
             # Para pintar el marcador de puntos
             self.marcador.pintar_marcador(self.pantalla)
@@ -581,6 +581,7 @@ class PantallaRecords(Pantalla):
 
 
 # -------- MÉTODOS PARA PINTAR LOS ELEMENTOS QUE SE MUESTRAN EN LA PANTALLA --------- #
+
 
     def cargar_datos(self):
         """Este método almacena los elementos a pintar en listas independientes para
