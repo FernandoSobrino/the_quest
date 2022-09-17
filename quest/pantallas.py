@@ -353,14 +353,14 @@ class PantallaJuego(Pantalla):
         if record_minimo == None and self.marcador.valor > 0:
             inputbox = InputBox(self.pantalla)
             nombre = inputbox.recoger_nombre()
-            if nombre == "":
+            if nombre == "" or len(nombre) < 3:
                 nombre = "---"
             bd.guardarRecords(nombre, self.marcador.valor)
         if record_minimo != None and record_minimo < self.marcador.valor:
             if self.marcador.valor > 0:
                 inputbox = InputBox(self.pantalla)
                 nombre = inputbox.recoger_nombre()
-                if nombre == "":
+                if nombre == "" or len(nombre) < 3:
                     nombre = "---"
                 bd.actualizarRecord(
                     nombre, self.marcador.valor, record_minimo)
