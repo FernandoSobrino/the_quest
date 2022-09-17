@@ -32,7 +32,7 @@ git clone https:// (lo que sigue)
     ejecuta en tu consola:
 
 ````
-cd quest
+cd the_quest
 ````
 
 ## Para crear el entorno virtual:
